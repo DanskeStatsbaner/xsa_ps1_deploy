@@ -1,0 +1,94 @@
+pipeline {
+
+    agent {
+        label "linux"
+    }
+    parameters {
+        booleanParam(name: 'TagLatest', defaultValue: false, description: 'Tag this image as latest')
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
+        timestamps()
+        disableConcurrentBuilds()
+    }
+    environment {
+        projectName  = "xsa_ps1_deploy"
+        deployTo = "sit"
+        version = "1.0.0.${env.BUILD_NUMBER}"
+        suffix = "${env.GIT_COMMIT}-${env.GIT_BRANCH.replace('/', '-')}"
+        packageVersion = "${version}-${suffix}"
+        jobName = "xsa_ps1_deploy"
+        artifactoryServerId = "artifactory"   
+    }
+
+    stages {
+        stage ("Stash files") {
+            steps {
+                stash includes: "Infrastructure/deploy0.ps1", name: "deployscript0", useDefaultExcludes: false  
+                stash includes: "Infrastructure/deploy.ps1", name: "deployscript", useDefaultExcludes: false
+            }
+        }
+        
+        stage ("Publish Artifacts") {
+            agent {
+                docker {
+                    image "octopusdeploy/octo"
+                    args '--entrypoint=\'\''
+                }
+		    }
+                steps {
+                unstash "deployscript"
+                unstash "deployscript0"
+                
+                sh "rm -rf dataART.${projectName}.${version}"
+                fileOperations([ 
+                        fileCopyOperation(
+                                flattenFiles: true,
+                                includes: "Infrastructure/deploy0.ps1",
+                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/"),
+                        fileCopyOperation(
+                                flattenFiles: true,
+                                includes: "Infrastructure/deploy.ps1",
+                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/")])
+
+                sh """ octo pack --id="dataART.${projectName}" --version="${packageVersion}" --basepath="$WORKSPACE/dataART.${projectName}.${version}" --outFolder=$WORKSPACE """
+                
+                rtUpload(
+                    spec: '''{ "files": [
+                        {
+                            "pattern": "dataART.${projectName}.${packageVersion}.nupkg",
+                            "target": "octopus/"
+                        }
+                    ] }''',
+                    buildNumber: "${packageVersion}", buildName: "dataART.${projectName}",
+                    serverId: "${artifactoryServerId}"
+                )
+                rtPublishBuildInfo(buildNumber: "${packageVersion}", buildName: "dataART.${projectName}", serverId: "${artifactoryServerId}")
+            }
+        }  
+        stage ("Octopus sit") {
+            agent {
+                docker {
+                    image "octopusdeploy/octo"
+                    args '--entrypoint=\'\''
+                }
+		    }
+            options { skipDefaultCheckout true }
+            environment {
+                deployTo = "sit"
+                releaseversion = "${version}"
+                apiKey = credentials("Octopus-Api")
+                octopusURL = "https://octopus.azure.dsb.dk"
+                hostargs = "--server ${octopusURL} --apiKey ${apiKey} --project ${jobName} --version=${releaseversion}"
+            }
+            steps {
+                addBadge(text: "octopus", icon: "/userContent/octopus_16x16.png", id: "octopus", link: "${octopusURL}/app#/Spaces-1/projects/${jobName}/deployments/releases/${releaseversion}")
+                sh """
+                    octo create-release  $hostargs --defaultpackageversion=${packageVersion}
+                    octo deploy-release $hostargs --deployto=${deployTo} --waitfordeployment --deploymentTimeout=00:20:00
+                """
+            }
+        }        
+
+    }
+}
