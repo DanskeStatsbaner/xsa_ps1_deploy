@@ -64,6 +64,32 @@ pipeline {
                     serverId: "${artifactoryServerId}"
                 )
                 rtPublishBuildInfo(buildNumber: "${packageVersion}", buildName: "dataART.${projectName}", serverId: "${artifactoryServerId}")
+                
+                                
+                sh "rm -rf dataART.${projectName}.latest"
+                fileOperations([ 
+                        fileCopyOperation(
+                                flattenFiles: true,
+                                includes: "Infrastructure/deploy0.ps1",
+                                targetLocation: "$WORKSPACE/dataART.${projectName}.latest/"),
+                        fileCopyOperation(
+                                flattenFiles: true,
+                                includes: "Infrastructure/deploy.ps1",
+                                targetLocation: "$WORKSPACE/dataART.${projectName}.latest/")])
+
+                sh """ octo pack --id="dataART.${projectName}" --version="latest" --basepath="$WORKSPACE/dataART.${projectName}.latest" --outFolder=$WORKSPACE """
+                
+                rtUpload(
+                    spec: '''{ "files": [
+                        {
+                            "pattern": "dataART.${projectName}.latest.nupkg",
+                            "target": "octopus/"
+                        }
+                    ] }''',
+                    buildNumber: "latest", buildName: "dataART.${projectName}",
+                    serverId: "${artifactoryServerId}"
+                )
+                rtPublishBuildInfo(buildNumber: "latest", buildName: "dataART.${projectName}", serverId: "${artifactoryServerId}")
             }
         }  
         stage ("Octopus sit") {
