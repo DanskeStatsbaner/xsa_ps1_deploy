@@ -1,4 +1,4 @@
-﻿$environment = $OctopusParameters["Octopus.Environment.Name"]
+$environment = $OctopusParameters["Octopus.Environment.Name"]
 
 # exit hvis miljø er Sandbox (sit)
 if($environment -eq "sit") { Exit }
@@ -17,5 +17,5 @@ docker login -u $login -p $artifactoryPW   $registry
 
 
 # hent vores SAP software container
-docker pull artifactory.azure.dsb.dk/docker/xsa_hdbcli
-docker run -t -d --name xsa_hdbcli artifactory.azure.dsb.dk/docker/xsa_hdbcli
+docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+docker run -t -d --name xsa_cli_deploy artifactory.azure.dsb.dk/docker/xsa_cli_deploy
