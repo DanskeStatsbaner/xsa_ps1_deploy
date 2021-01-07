@@ -1,4 +1,4 @@
-$environment = $OctopusParameters["Octopus.Environment.Name"]
+﻿$environment = $OctopusParameters["Octopus.Environment.Name"]
 
 # exit hvis miljø er Sandbox (sit)
 if($environment -eq "sit") { Exit }
@@ -18,9 +18,12 @@ $XSAspace = $OctopusParameters["dataART.XSASpace[$environment]"]
 
 # kopier mtar filen (f.eks. dataART.CITest.1.0.0.113.mtar) til et bestemt bibliotek c:\octopus\work
 
+rm -R c:\octopus\work\dataArt.$projectName.$releaseNumber
+md -Path c:\octopus\work\dataArt.$projectName.$releaseNumber
+
 docker cp $workdirPath\dataArt.$projectName.$releaseNumber.mtar xsa_cli_deploy:/root/dataArt.$projectName.$releaseNumber.mtar
 docker container diff xsa_cli_deploy
-docker cp xsa_cli_deploy:/root/. c:\octopus\work
+docker cp xsa_cli_deploy:/root/. c:\octopus\work\dataArt.$projectName.$releaseNumber
 
 # Her sker det: 
 # -v = run container og mount det eksterne bibliotek som /data
@@ -30,7 +33,9 @@ docker cp xsa_cli_deploy:/root/. c:\octopus\work
 #    login hana
 #    deploy hana
 
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && ls -la && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
+docker run -v c:\octopus\work\dataArt.$projectName.$releaseNumber:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && ls -la && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
+
+#rm -R c:\octopus\work\dataArt.$projectName.$releaseNumber
 
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"
