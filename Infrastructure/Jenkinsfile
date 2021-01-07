@@ -24,11 +24,6 @@ pipeline {
     stages {
         stage ("Stash files") {
             steps {
-//                stash includes: "Infrastructure/afload.ps1", name: "afloadscript", useDefaultExcludes: false
-//                stash includes: "Infrastructure/deploy0.ps1", name: "deployscript0", useDefaultExcludes: false  
-//                stash includes: "Infrastructure/deploy.ps1", name: "deployscript", useDefaultExcludes: false
-//                stash includes: "Infrastructure/postdeploy.ps1", name: "postdeployscript", useDefaultExcludes: false
-//                stash includes: "Infrastructure/test.ps1", name: "testscript", useDefaultExcludes: false
                 stash includes: "Infrastructure/*.ps1", name: "PSscripts", useDefaultExcludes: false
                 stash includes: "Infrastructure/*.txt", name: "SQLscripts", useDefaultExcludes: false
             }
@@ -42,36 +37,11 @@ pipeline {
                 }
 		    }
                 steps {
-//                unstash "afloadscript"
-//                unstash "deployscript0"
-//                unstash "deployscript"
-//                unstash "postdeployscript"
-//                unstash "testscript"
                 unstash "PSscripts"
                 unstash "SQLscripts"                
                 
                 sh "rm -rf dataART.${projectName}.${version}"
                 fileOperations([ 
-//                        fileCopyOperation(
-//                                flattenFiles: true,
-//                                includes: "Infrastructure/afload.ps1",
-//                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/"),
-//                        fileCopyOperation(
-//                                flattenFiles: true,
-//                                includes: "Infrastructure/deploy0.ps1",
-//                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/"),
-//                        fileCopyOperation(
-//                                flattenFiles: true,
-//                                includes: "Infrastructure/deploy.ps1",
-//                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/"),
-//                        fileCopyOperation(
-//                                flattenFiles: true,
-//                                includes: "Infrastructure/postdeploy.ps1",
-//                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/"),
-//                        fileCopyOperation(
-//                                flattenFiles: true,
-//                                includes: "Infrastructure/test.ps1",
-//                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/")
                         fileCopyOperation(
                                 flattenFiles: true,
                                 includes: "Infrastructure/*.ps1",
