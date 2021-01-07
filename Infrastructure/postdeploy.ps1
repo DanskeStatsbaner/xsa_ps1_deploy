@@ -20,10 +20,24 @@ $HANAHost = $OctopusParameters["dataART.Host[$environment]"]
 $HANAInstance = $OctopusParameters["dataART.Instance[$environment]"]
 $HANADatabase = $OctopusParameters["dataART.Database[$environment]"]
 
+docker run -v c:\octopus\work\dataArt.$projectName.$releaseNumber:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($project)-serviceName.txt"
 
-#docker run -v c:\octopus\work\dataArt.$projectName.$releaseNumber:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && ls -la && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > $($project)-serviceName.txt"
+$File = Get-Content c:\octopus\work\dataArt.$projectName.$releaseNumber\$($project)-serviceName.txt
 
+Write-Host "File: $File"
+
+foreach ($line in $File)
+{
+    $Arr = $line -split ' '
+    foreach ($cell in $Arr)
+    {
+        if ($cell -eq 'hdi-shared'){$serviceName = $Arr[0]}
+    }
+}
+
+$serviceKey = $($serviceName) + "-sk"
+
+Write-Host "Service key: $serviceKey"
 
 write-host "*******************************************************************"
 write-host " STOP postdeploy.ps1"
