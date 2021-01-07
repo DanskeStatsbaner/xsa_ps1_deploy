@@ -44,6 +44,8 @@ docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_depl
 
 $File = Get-Content c:\octopus\work\$($projectName)-serviceKey.txt
 
+Write-Host "Service Key File: $File"
+
 foreach ($line in $File)
 {
     $Arr = $line -split ' '
@@ -59,6 +61,9 @@ foreach ($line in $File)
         }
     }
 }
+
+Write-Host "User: $userArr[1]"
+Write-Host "PW: $passwordArr[1]"
 
 $File = Get-Content c:\octopus\work\testSQL.txt
 
