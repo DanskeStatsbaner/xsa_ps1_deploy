@@ -40,7 +40,8 @@ $serviceKey = $($serviceName) + "-sk"
 
 write-host "*** Setup servicekey $serviceKey"
 
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > $($projectName)-serviceKey.txt"
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey"
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs service-key $serviceName $serviceKey > $($projectName)-serviceKey.txt"
 
 $File = Get-Content c:\octopus\work\$($projectName)-serviceKey.txt
 
