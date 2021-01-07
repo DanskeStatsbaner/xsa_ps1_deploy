@@ -44,8 +44,6 @@ docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_depl
 
 $File = Get-Content c:\octopus\work\$($projectName)-serviceKey.txt
 
-Write-Host "Service Key File: $File"
-
 foreach ($line in $File)
 {
     $Arr = $line -split ' '
@@ -62,8 +60,9 @@ foreach ($line in $File)
     }
 }
 
-Write-Host "User: $userArr[1]"
-Write-Host "PW: $passwordArr[1]"
+
+$DBuser = $userArr[1]
+$DBpw = $passwordArr[1]
 
 $File = Get-Content c:\octopus\work\testSQL.txt
 
@@ -74,7 +73,7 @@ Set-Content -Path c:\octopus\work\testSQLoneLine.txt -Value $allLines
 
 write-host "*** Run post-deployment SQL"
 
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $userArr[1] -p $passwordArr[1] -quiet -a -I testSQLoneLine.txt -o testSQLoutput.txt"
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I testSQLoneLine.txt -o testSQLoutput.txt"
 
 write-host "*** Cleanup - delete servicekey"
 
