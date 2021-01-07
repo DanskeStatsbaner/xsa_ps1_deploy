@@ -6,6 +6,7 @@ if($environment -eq "sit") { Exit }
 write-host "*******************************************************************"
 write-host " START postdeploy.ps1"
 write-host "*******************************************************************"
+
 $XSAPW = $args[0]
 
 $workdirPath = $(pwd)
@@ -20,11 +21,11 @@ $HANAHost = $OctopusParameters["dataART.Host[$environment]"]
 $HANAInstance = $OctopusParameters["dataART.Instance[$environment]"]
 $HANADatabase = $OctopusParameters["dataART.Database[$environment]"]
 
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($project)-serviceName.txt"
+write-host "*** Get MTA information for $projectName"
 
-$File = Get-Content c:\octopus\work\$($project)-serviceName.txt
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($projectName)-serviceName.txt"
 
-Write-Host "File: $File"
+$File = Get-Content c:\octopus\work\$($projectName)-serviceName.txt
 
 foreach ($line in $File)
 {
@@ -37,7 +38,42 @@ foreach ($line in $File)
 
 $serviceKey = $($serviceName) + "-sk"
 
-Write-Host "Service key: $serviceKey"
+write-host "*** Setup servicekey $serviceKey"
+
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > $($projectName)-serviceKey.txt"
+
+$File = Get-Content c:\octopus\work\$($projectName)-serviceKey.txt
+
+foreach ($line in $File)
+{
+    $Arr = $line -split ' '
+    foreach ($cell in $Arr)
+    {
+        if ($cell -eq '"user"')
+        {
+            $userArr = $Arr[4] -split '"'
+        }
+        if ($cell -eq '"password"')
+        {
+            $passwordArr = $Arr[4] -split '"'
+        }
+    }
+}
+
+$File = Get-Content c:\octopus\work\testSQL.txt
+
+$allLines = [string]::join(" ",($File.Split("`n")))
+$allLines = [string]::join(" ",($allLines.Split("`r")))
+
+Set-Content -Path c:\octopus\work\testSQLoneLine.txt -Value $allLines
+
+write-host "*** Run post-deployment SQL"
+
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $userArr[1] -p $passwordArr[1] -quiet -a -I testSQLoneLine.txt -o testSQLoutput.txt"
+
+write-host "*** Cleanup - delete servicekey"
+
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
 write-host "*******************************************************************"
 write-host " STOP postdeploy.ps1"
