@@ -73,7 +73,7 @@ Set-Content -Path c:\octopus\work\testSQLoneLine.txt -Value $allLines
 
 write-host "*** Run post-deployment SQL"
 
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I testSQLoneLine.txt -o testSQLoutput.txt"
+docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/testSQLoneLine.txt -o /data/testSQLoutput.txt"
 
 write-host "*** Cleanup - delete servicekey"
 
