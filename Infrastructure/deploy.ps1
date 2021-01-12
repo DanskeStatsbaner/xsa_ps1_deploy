@@ -12,9 +12,9 @@ $workdirPath = $(pwd)
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 
-$XSAurl = $OctopusParameters["dataART.XSAUrl[$environment]"]
-$XSAuser = $OctopusParameters["dataART.XSAUser[$environment]"]
-$XSAspace = $OctopusParameters["dataART.XSASpace[$environment]"]
+$XSAurl = $OctopusParameters["dataART.XSAUrl"]
+$XSAuser = $OctopusParameters["dataART.XSAUser"]
+$XSAspace = $OctopusParameters["dataART.XSASpace"]
 
 # kopier mtar filen (f.eks. dataART.CITest.1.0.0.113.mtar) til et bestemt bibliotek c:\octopus\work
 

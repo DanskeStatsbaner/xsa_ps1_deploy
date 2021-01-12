@@ -12,9 +12,9 @@ $workdirPath = $(pwd)
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 
-$XSAurl = $OctopusParameters["dataART.XSAUrl[$environment]"]
-$XSAuser = $OctopusParameters["dataART.XSAUser[$environment]"]
-$XSAspace = $OctopusParameters["dataART.XSASpace[$environment]"]
+$XSAurl = $OctopusParameters["dataART.XSAUrl"]
+$XSAuser = $OctopusParameters["dataART.XSAUser"]
+$XSAspace = $OctopusParameters["dataART.XSASpace"]
 
 write-host "*******************************************************************"
 write-host " STOP test.ps1"

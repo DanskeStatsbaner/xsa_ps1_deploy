@@ -8,19 +8,19 @@ write-host " START DBPrep.ps1"
 write-host "*******************************************************************"
 
 $DBpw = $args[0]
-$DBuser = $OctopusParameters["dataART.DBUser[$environment]"]
+$DBuser = $OctopusParameters["dataART.DBUser"]
 
 $workdirPath = $(pwd)
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 
-$XSAurl = $OctopusParameters["dataART.XSAUrl[$environment]"]
-$XSAuser = $OctopusParameters["dataART.XSAUser[$environment]"]
-$XSAspace = $OctopusParameters["dataART.XSASpace[$environment]"]
+$XSAurl = $OctopusParameters["dataART.XSAUrl"]
+$XSAuser = $OctopusParameters["dataART.XSAUser"]
+$XSAspace = $OctopusParameters["dataART.XSASpace"]
 
-$HANAHost = $OctopusParameters["dataART.Host[$environment]"]
-$HANAInstance = $OctopusParameters["dataART.Instance[$environment]"]
-$HANADatabase = $OctopusParameters["dataART.Database[$environment]"]
+$HANAHost = $OctopusParameters["dataART.Host"]
+$HANAInstance = $OctopusParameters["dataART.Instance"]
+$HANADatabase = $OctopusParameters["dataART.Database"]
 
 $allLines = 'CALL "SYSTEM"."GRANT_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
 
