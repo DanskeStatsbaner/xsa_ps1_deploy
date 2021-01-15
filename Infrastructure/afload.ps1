@@ -1,21 +1,35 @@
-$environment = $OctopusParameters["Octopus.Environment.Name"]
+﻿$environment = $OctopusParameters["Octopus.Environment.Name"]
 
-# exit hvis miljø er Sandbox (sit)
+# exit if environment is Sandbox (sit)
 if($environment -eq "sit") { Exit }
+
+write-host "*******************************************************************"
+write-host " START afload.ps1"
+write-host "*******************************************************************"
+
+###############################################################################
+# Get all relevant parameters from octopus (variable set dataART)
+###############################################################################
 
 $login = $OctopusParameters["artifactory.login"]
 $registry = $OctopusParameters["artifactory.registry"]
 $artifactoryPW = $args[0]
 
-# stop alle kørende containers
+###############################################################################
+# Stop and delete containers
+###############################################################################
+
 docker container stop $(docker container ls -aq)
-# slet alle containers
 docker container prune -f
 
-# login artifactory
+###############################################################################
+# Login to artifactory, pull and start XSA_CLI_DEPLOY container
+###############################################################################
+
 docker login -u $login -p $artifactoryPW   $registry
-
-
-# hent vores SAP software container
 docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 docker run -t -d --name xsa_cli_deploy artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+
+write-host "*******************************************************************"
+write-host " STOP afload.ps1"
+write-host "*******************************************************************"

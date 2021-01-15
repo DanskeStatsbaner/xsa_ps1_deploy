@@ -1,11 +1,16 @@
 ﻿$environment = $OctopusParameters["Octopus.Environment.Name"]
 
-# exit hvis miljø er Sandbox (sit)
+# exit if environment is Sandbox (sit)
 if($environment -eq "sit") { Exit }
 
 write-host "*******************************************************************"
 write-host " START deploy.ps1"
 write-host "*******************************************************************"
+
+###############################################################################
+# Get all relevant parameters from octopus (variable set dataART)
+###############################################################################
+
 $XSAPW = $args[0]
 
 $workdirPath = $(pwd)
@@ -16,18 +21,26 @@ $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]
 $XSAspace = $OctopusParameters["dataART.XSASpace"]
 
-# kopier mtar filen (f.eks. dataART.CITest.1.0.0.113.mtar) til et bestemt bibliotek c:\octopus\work
+###############################################################################
+# Copy project mtar file to work directory - c:\octopus\work\
+###############################################################################
 
 docker cp $workdirPath\dataArt.$projectName.$releaseNumber.mtar xsa_cli_deploy:/root/dataArt.$projectName.$releaseNumber.mtar
 docker container diff xsa_cli_deploy
 docker cp xsa_cli_deploy:/root/. c:\octopus\work\
-# Her sker det: 
-# -v = run container og mount det eksterne bibliotek som /data
-# /bin/sh -c  = kør shell i container:
-#    cp = kopier mtar fra mount til root
-#    ls -la = vis hvad der ligger i root
+
+###############################################################################
+# Deploy:
+#
+# Docker run explain: 
+# -v = run container and mount work library as /data
+# /bin/sh -c  = run shell within container:
+#    cp = copy mtar from mount to container root
+#    ls -la = show container root content
 #    login hana
 #    deploy hana
+#
+###############################################################################
 
 docker run -v c:\octopus\work\:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && ls -la && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
 
