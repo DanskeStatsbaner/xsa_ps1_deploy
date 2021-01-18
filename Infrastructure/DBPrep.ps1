@@ -38,7 +38,8 @@ Set-Content c:\octopus\work\$($projectName)-SQLoneLine.txt -value $allLines
 
 write-host "*** Run DB prepare SQL"
 
-docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -o /data/$($projectName)-SQLoutput.txt"
+#docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -o /data/$($projectName)-SQLoutput.txt"
+docker exec xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -o /data/$($projectName)-SQLoutput.txt"
 
 ###############################################################################
 # Cleanup - delete files
