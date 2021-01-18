@@ -80,7 +80,8 @@ $DBpw = $passwordArr[1]
 
 write-host "*** Run pre-deployment SQL"
 
-$fullPath = "$($workdirPath)octopus\work\Deployment\PreDeploy\$($environment)\*.txt"
+$workdirShort = $workdirPath.Substring(0, $workdirPath.IndexOf("\Script"))
+$fullPath = "$($workdirShort)\PreDeploy\$($environment)\*.txt"
 
 $files = Get-ChildItem -Path $fullPath | sort $files.FullName
 
