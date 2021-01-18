@@ -13,7 +13,7 @@ write-host "*******************************************************************"
 
 $XSAPW = $args[0]
 
-$workdirPath = $(pwd)
+$workdirPath = $pwd.ToString()
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 
@@ -80,7 +80,7 @@ $DBpw = $passwordArr[1]
 
 write-host "*** Run pre-deployment SQL"
 
-$workdirShort = $workdirPath.Substring(0, 52)
+$workdirShort = $workdirPath.Substring(0, $workdirPath.IndexOf("\Scripts"))
 $fullPath = "$($workdirShort)\PreDeploy\$($environment)\*.txt"
 
 $files = Get-ChildItem -Path $fullPath | sort $files.FullName
