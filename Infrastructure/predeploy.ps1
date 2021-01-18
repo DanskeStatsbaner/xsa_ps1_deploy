@@ -80,8 +80,7 @@ $DBpw = $passwordArr[1]
 
 write-host "*** Run pre-deployment SQL"
 
-$scriptPos = $workdirPath.IndexOf("\Scripts")
-$workdirShort = $workdirPath.Substring(0, $scriptPos)
+$workdirShort = $workdirPath.Substring(0, 52)
 $fullPath = "$($workdirShort)\PreDeploy\$($environment)\*.txt"
 
 $files = Get-ChildItem -Path $fullPath | sort $files.FullName
