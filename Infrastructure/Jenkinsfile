@@ -25,7 +25,6 @@ pipeline {
         stage ("Stash files") {
             steps {
                 stash includes: "Infrastructure/*.ps1", name: "PSscripts", useDefaultExcludes: false
-                stash includes: "Infrastructure/*.txt", name: "SQLscripts", useDefaultExcludes: false
             }
         }
         
@@ -38,17 +37,12 @@ pipeline {
 		    }
                 steps {
                 unstash "PSscripts"
-                unstash "SQLscripts"                
                 
                 sh "rm -rf dataART.${projectName}.${version}"
                 fileOperations([ 
                         fileCopyOperation(
                                 flattenFiles: true,
                                 includes: "Infrastructure/*.ps1",
-                                targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/"),
-                        fileCopyOperation(
-                                flattenFiles: true,
-                                includes: "Infrastructure/*.txt",
                                 targetLocation: "$WORKSPACE/dataART.${projectName}.${version}/")])
 
                 sh """ octo pack --id="dataART.${projectName}" --version="${packageVersion}" --basepath="$WORKSPACE/dataART.${projectName}.${version}" --outFolder=$WORKSPACE """
