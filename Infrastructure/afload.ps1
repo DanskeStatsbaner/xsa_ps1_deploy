@@ -12,17 +12,22 @@ write-host "*******************************************************************"
 ###############################################################################
 
 $workdirPath = $pwd.ToString()
+$workdirRoot = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
+
 write-host "WORKDIR: $workdirPath"
 
+$artifactoryPW = $args[0]
 $login = $OctopusParameters["artifactory.login"]
 $registry = $OctopusParameters["artifactory.registry"]
-$artifactoryPW = $args[0]
+$projectName = $OctopusParameters["Octopus.Project.Name"]
+$containerName = $projectName
 
 ###############################################################################
 # Stop and delete containers
 ###############################################################################
 
-docker container stop $(docker container ls -aq)
+#docker container stop $(docker container ls -aq)
+#docker container rm $containerName -f
 docker container prune -f
 
 ###############################################################################
@@ -31,7 +36,8 @@ docker container prune -f
 
 docker login -u $login -p $artifactoryPW   $registry
 docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
-docker run -t -d --name xsa_cli_deploy artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+#docker run -t -d --name xsa_cli_deploy artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+docker run -v $($workdirRoot):/data -t -d --name $containerName -rm artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 
 write-host "*******************************************************************"
 write-host " STOP afload.ps1"
