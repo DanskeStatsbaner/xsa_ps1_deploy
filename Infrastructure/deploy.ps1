@@ -14,6 +14,8 @@ write-host "*******************************************************************"
 $XSAPW = $args[0]
 
 $workdirPath = $pwd.ToString()
+$workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
+
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 $containerName = $projectName
