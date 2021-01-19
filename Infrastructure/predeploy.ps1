@@ -13,9 +13,6 @@ write-host "*******************************************************************"
 
 $XSAPW = $args[0]
 
-$workdirPath = $pwd.ToString()
-$workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
-
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 $containerName = $projectName
@@ -35,6 +32,7 @@ $HANADatabase = $OctopusParameters["dataART.Database"]
 
 write-host "*** Get SQL from project"
 
+$workdirPath = $pwd.ToString()
 $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
 $fullPath = "$($workdirPath)\Deployment\PreDeploy\$($environment)\*.txt"
