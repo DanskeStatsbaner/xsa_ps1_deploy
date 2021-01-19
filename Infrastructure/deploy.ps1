@@ -29,9 +29,6 @@ $XSAspace = $OctopusParameters["dataART.XSASpace"]
 ###############################################################################
 
 Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "C:\octopus\work" -Force
-#docker cp $workdirPath\dataArt.$projectName.$releaseNumber.mtar xsa_cli_deploy:/root/dataArt.$projectName.$releaseNumber.mtar
-#docker container diff xsa_cli_deploy
-#docker cp xsa_cli_deploy:/root/. c:\octopus\work\
 
 ###############################################################################
 # Deploy:
@@ -44,7 +41,6 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 #
 ###############################################################################
 
-#docker run -v c:\octopus\work\:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && ls -la && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
 docker exec -it $containerName /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
 
 write-host "*******************************************************************"
