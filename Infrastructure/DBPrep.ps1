@@ -30,16 +30,15 @@ $HANADatabase = $OctopusParameters["dataART.Database"]
 # Execute prepare SQL
 ###############################################################################
 
-$allLines = 'CALL "SYSTEM"."GRANT_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
-
-if (Test-Path c:\octopus\work\$($projectName)-SQLoutput.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoutput.txt }
-if (Test-Path c:\octopus\work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoneLine.txt }
-Set-Content c:\octopus\work\$($projectName)-SQLoneLine.txt -value $allLines 
-
 write-host "*** Run DB prepare SQL"
 
-#docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -o /data/$($projectName)-SQLoutput.txt"
-docker exec xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -o /data/$($projectName)-SQLoutput.txt"
+$allLines = 'CALL "SYSTEM"."GRANT_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
+
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
+Set-Content c:\Octopus\Work\$($projectName)-SQLoneLine.txt -value $allLines 
+
+docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
 
 ###############################################################################
 # Cleanup - delete files

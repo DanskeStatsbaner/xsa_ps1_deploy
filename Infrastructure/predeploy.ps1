@@ -25,7 +25,6 @@ $HANAHost = $OctopusParameters["dataART.Host"]
 $HANAInstance = $OctopusParameters["dataART.Instance"]
 $HANADatabase = $OctopusParameters["dataART.Database"]
 
-
 ###############################################################################
 # Get SQL from project
 ###############################################################################
@@ -54,7 +53,7 @@ $allLines = [string]::join(" ", $arrFiles)
 if ($allLines -eq ' ')
 {
    write-host "*******************************************************************"
-   write-host " STOP predeploy.ps1"
+   write-host " STOP predeploy.ps1 - no pre-deploy SQL defined"
    write-host "*******************************************************************"
    Exit
 }
@@ -67,7 +66,6 @@ write-host "*** Get MTA information for $projectName"
 
 if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
 
-#docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($projectName)-serviceName.txt"
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($projectName)-serviceName.txt"
 
 $File = Get-Content c:\Octopus\Work\$($projectName)-serviceName.txt
@@ -91,10 +89,9 @@ write-host "*** Setup servicekey $serviceKey"
 
 if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
 
-#docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey"
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs service-key $serviceName $serviceKey > /data/$($projectName)-serviceKey.txt"
+docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($projectName)-serviceKey.txt"
+#docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey"
+#docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs service-key $serviceName $serviceKey > /data/$($projectName)-serviceKey.txt"
 
 $File = Get-Content c:\Octopus\Work\$($projectName)-serviceKey.txt
 
@@ -117,13 +114,10 @@ $DBpw = $passwordArr[1]
 
 write-host "*** Run pre-deployment SQL"
 
-Write-Host "ALL LINES: $allLines" 
-
 if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
 if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
 Set-Content c:\Octopus\Work\$($projectName)-SQLoneLine.txt -value $allLines 
 
-#docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
 docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
 
 ###############################################################################
@@ -152,7 +146,6 @@ ForEach($fileLine in $fileContentArr)
 
 write-host "*** Cleanup - delete servicekey"
 
-#docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
 if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
