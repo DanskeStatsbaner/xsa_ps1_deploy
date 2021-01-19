@@ -28,6 +28,39 @@ $HANAHost = $OctopusParameters["dataART.Host"]
 $HANAInstance = $OctopusParameters["dataART.Instance"]
 $HANADatabase = $OctopusParameters["dataART.Database"]
 
+
+###############################################################################
+# Get SQL from project
+###############################################################################
+
+write-host "*** Get SQL from project"
+
+$workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
+
+$fullPath = "$($workdirPath)\Deployment\PreDeploy\$($environment)\*.txt"
+
+$files = Get-ChildItem -Path c:$($fullPath) | sort $files.FullName
+
+$arrFiles = @();
+
+foreach($file in $files ) 
+{
+    $fileContent = Get-Content $file.FullName
+    $allLines = [string]::join(" ",($fileContent.Split("`n")))
+    $allLines = [string]::join(" ",($allLines.Split("`r")))
+    $arrFiles += $allLines;
+}
+
+$allLines = [string]::join(" ", $arrFiles)
+
+if ($allLines -eq ' ')
+{
+   write-host "*******************************************************************"
+   write-host " STOP predeploy.ps1"
+   write-host "*******************************************************************"
+   Exit
+}
+
 ###############################################################################
 # Get the XSA servicename for the project from the mta.yaml file
 ###############################################################################
@@ -62,6 +95,8 @@ if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\O
 
 #docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
+docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey"
+docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs service-key $serviceName $serviceKey > /data/$($projectName)-serviceKey.txt"
 
 $File = Get-Content c:\Octopus\Work\$($projectName)-serviceKey.txt
 
@@ -83,24 +118,6 @@ $DBpw = $passwordArr[1]
 ###############################################################################
 
 write-host "*** Run pre-deployment SQL"
-
-$workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
-
-$fullPath = "$($workdirPath)\Deployment\PreDeploy\$($environment)\*.txt"
-
-$files = Get-ChildItem -Path c:$($fullPath) | sort $files.FullName
-
-$arrFiles = @();
-
-foreach($file in $files ) 
-{
-    $fileContent = Get-Content $file.FullName
-    $allLines = [string]::join(" ",($fileContent.Split("`n")))
-    $allLines = [string]::join(" ",($allLines.Split("`r")))
-    $arrFiles += $allLines;
-}
-
-$allLines = [string]::join(" ", $arrFiles)
 
 Write-Host "ALL LINES: $allLines" 
 
