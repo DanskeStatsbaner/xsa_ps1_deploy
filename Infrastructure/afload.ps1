@@ -12,9 +12,6 @@ write-host "*******************************************************************"
 ###############################################################################
 
 $workdirPath = $pwd.ToString()
-$workdirRoot = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
-
-write-host "WORKDIR: $workdirRoot"
 
 $artifactoryPW = $args[0]
 $login = $OctopusParameters["artifactory.login"]
@@ -27,8 +24,8 @@ $containerName = $projectName
 ###############################################################################
 
 #docker container stop $(docker container ls -aq)
-#docker container rm $containerName -f
-#docker container prune -f
+docker container rm $containerName -f
+docker container prune -f
 
 ###############################################################################
 # Login to artifactory, pull and start XSA_CLI_DEPLOY container
@@ -37,7 +34,7 @@ $containerName = $projectName
 docker login -u $login -p $artifactoryPW   $registry
 docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 #docker run -t -d --name xsa_cli_deploy artifactory.azure.dsb.dk/docker/xsa_cli_deploy
-docker run -v c:$($workdirRoot):/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+docker run -v C:\Octopus\Work:/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 
 write-host "*******************************************************************"
 write-host " STOP afload.ps1"

@@ -14,9 +14,7 @@ write-host "*******************************************************************"
 $XSAPW = $args[0]
 
 $workdirPath = $pwd.ToString()
-$workdirRoot = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
-
-write-host "WORKDIRROOT: $workdirRoot"
+$workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
@@ -36,14 +34,12 @@ $HANADatabase = $OctopusParameters["dataART.Database"]
 
 write-host "*** Get MTA information for $projectName"
 
-#if (Test-Path c:\octopus\work\$($projectName)-serviceName.txt) { Remove-Item c:\octopus\work\$($projectName)-serviceName.txt }
-if (Test-Path c:$($workdirRoot)\$($projectName)-serviceName.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-serviceName.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
 
 #docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($projectName)-serviceName.txt"
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($projectName)-serviceName.txt"
 
-#$File = Get-Content c:\octopus\work\$($projectName)-serviceName.txt
-$File = Get-Content c:$($workdirRoot)\$($projectName)-serviceName.txt
+$File = Get-Content c:\Octopus\Work\$($projectName)-serviceName.txt
 
 foreach ($line in $File)
 {
@@ -62,14 +58,12 @@ $serviceKey = $($serviceName) + "-sk"
 
 write-host "*** Setup servicekey $serviceKey"
 
-#if (Test-Path c:\octopus\work\$($projectName)-serviceKey.txt) { Remove-Item c:\octopus\work\$($projectName)-serviceKey.txt }
-if (Test-Path c:$($workdirRoot)\$($projectName)-serviceKey.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-serviceKey.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
 
 #docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
-#$File = Get-Content c:\octopus\work\$($projectName)-serviceKey.txt
-$File = Get-Content c:$($workdirRoot)\$($projectName)-serviceKey.txt
+$File = Get-Content c:\Octopus\Work\$($projectName)-serviceKey.txt
 
 foreach ($line in $File)
 {
@@ -90,10 +84,11 @@ $DBpw = $passwordArr[1]
 
 write-host "*** Run pre-deployment SQL"
 
-#$workdirShort = $workdirPath.Substring(0, $workdirPath.IndexOf("\Scripts"))
-$fullPath = "c:$($workdirRoot)\Deployment\PreDeploy\$($environment)\*.txt"
+$workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
-$files = Get-ChildItem -Path $fullPath | sort $files.FullName
+$fullPath = "$($workdirPath)\Deployment\PreDeploy\$($environment)\*.txt"
+
+$files = Get-ChildItem -Path c:$($fullPath) | sort $files.FullName
 
 $arrFiles = @();
 
@@ -109,13 +104,9 @@ $allLines = [string]::join(" ", $arrFiles)
 
 Write-Host "ALL LINES: $allLines" 
 
-#if (Test-Path c:\octopus\work\$($projectName)-SQLoutput.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoutput.txt }
-#if (Test-Path c:\octopus\work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoneLine.txt }
-#Set-Content c:\octopus\work\$($projectName)-SQLoneLine.txt -value $allLines 
-
-if (Test-Path c:$($workdirRoot)\$($projectName)-SQLoutput.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-SQLoutput.txt }
-if (Test-Path c:$($workdirRoot)\$($projectName)-SQLoneLine.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-SQLoneLine.txt }
-Set-Content c:$($workdirRoot)\$($projectName)-SQLoneLine.txt -value $allLines 
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
+Set-Content c:\Octopus\Work\$($projectName)-SQLoneLine.txt -value $allLines 
 
 #docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
 docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
@@ -124,8 +115,7 @@ docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance 
 # Analyse SQL result
 ###############################################################################
 
-#$fileContent = Get-Content c:\octopus\work\$($projectName)-SQLoutput.txt
-$fileContent = Get-Content c:$($workdirRoot)\$($projectName)-SQLoutput.txt
+$fileContent = Get-Content c:\Octopus\Work\$($projectName)-SQLoutput.txt
 
 $fileContentArr = $fileContent.Split(@("`r`n", "`r", "`n"),[StringSplitOptions]::None)
 
@@ -150,15 +140,10 @@ write-host "*** Cleanup - delete servicekey"
 #docker run -v c:\octopus\work:/data artifactory.azure.dsb.dk/docker/xsa_cli_deploy /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
-#if (Test-Path c:\octopus\work\$($projectName)-serviceName.txt) { Remove-Item c:\octopus\work\$($projectName)-serviceName.txt }
-#if (Test-Path c:\octopus\work\$($projectName)-serviceKey.txt) { Remove-Item c:\octopus\work\$($projectName)-serviceKey.txt }
-#if (Test-Path c:\octopus\work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoutput.txt }
-#if (Test-Path c:\octopus\work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoneLine.txt }
-
-if (Test-Path c:$($workdirRoot)\$($projectName)-serviceName.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-serviceName.txt }
-if (Test-Path c:$($workdirRoot)\$($projectName)-serviceKey.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-serviceKey.txt }
-if (Test-Path c:$($workdirRoot)\$($projectName)-SQLoneLine.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-SQLoutput.txt }
-if (Test-Path c:$($workdirRoot)\$($projectName)-SQLoneLine.txt) { Remove-Item c:$($workdirRoot)\$($projectName)-SQLoneLine.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
 
 write-host "*******************************************************************"
 write-host " STOP predeploy.ps1"
