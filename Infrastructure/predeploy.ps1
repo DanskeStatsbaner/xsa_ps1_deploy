@@ -14,6 +14,7 @@ write-host "*******************************************************************"
 $XSAPW = $args[0]
 
 $workdirPath = $pwd.ToString()
+write-host "WORKDIR: $workdirPath"
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 

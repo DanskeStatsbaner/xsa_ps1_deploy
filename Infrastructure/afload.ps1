@@ -11,6 +11,9 @@ write-host "*******************************************************************"
 # Get all relevant parameters from octopus (variable set dataART)
 ###############################################################################
 
+$workdirPath = $pwd.ToString()
+write-host "WORKDIR: $workdirPath"
+
 $login = $OctopusParameters["artifactory.login"]
 $registry = $OctopusParameters["artifactory.registry"]
 $artifactoryPW = $args[0]
