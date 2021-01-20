@@ -4,18 +4,13 @@
 if($environment -eq "sit") { Exit }
 
 write-host "*******************************************************************"
-write-host " START afload.ps1"
+write-host " START cleanup.ps1"
 write-host "*******************************************************************"
 
 ###############################################################################
 # Get all relevant parameters from octopus (variable set dataART)
 ###############################################################################
 
-$workdirPath = $pwd.ToString()
-
-$artifactoryPW = $args[0]
-$login = $OctopusParameters["artifactory.login"]
-$registry = $OctopusParameters["artifactory.registry"]
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $containerName = $projectName
 
@@ -27,13 +22,15 @@ if ($(docker container ls -aq -f name="$containerName").length -gt 0){ docker co
 docker container prune -f
 
 ###############################################################################
-# Login to artifactory, pull and start XSA_CLI_DEPLOY container
+# Delete workfiles
 ###############################################################################
 
-docker login -u $login -p $artifactoryPW   $registry
-docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
-docker run -v C:\Octopus\Work:/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
+if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
+if (Test-Path c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).mtar) { Remove-Item c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).mtar }
 
 write-host "*******************************************************************"
-write-host " STOP afload.ps1"
+write-host " STOP cleanup.ps1"
 write-host "*******************************************************************"
