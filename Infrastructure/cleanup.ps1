@@ -12,6 +12,7 @@ write-host "*******************************************************************"
 ###############################################################################
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
+$releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 $containerName = $projectName
 
 ###############################################################################
