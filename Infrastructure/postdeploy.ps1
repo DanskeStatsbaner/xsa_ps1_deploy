@@ -15,7 +15,7 @@ $XSAPW = $args[0]
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = "$($projectName).$($releaseNumber).$($environment)"
+$containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
 
 $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]

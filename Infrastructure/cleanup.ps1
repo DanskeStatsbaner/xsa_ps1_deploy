@@ -13,7 +13,7 @@ write-host "*******************************************************************"
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = "$($projectName).$($releaseNumber).$($environment)"
+$containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
 
 ###############################################################################
 # Stop and delete containers
@@ -30,7 +30,7 @@ if (Test-Path c:\Octopus\Work\$($containerName)-SQLoutput.txt) { Remove-Item c:\
 if (Test-Path c:\Octopus\Work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoneLine.txt }
 if (Test-Path c:\Octopus\Work\$($containerName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceName.txt }
 if (Test-Path c:\Octopus\Work\$($containerName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceKey.txt }
-if (Test-Path c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).$($environment).mtar) { Remove-Item c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).$($environment).mtar }
+if (Test-Path c:\Octopus\Work\$($containerName).mtar) { Remove-Item c:\Octopus\Work\$($containerName).mtar }
 
 write-host "*******************************************************************"
 write-host " STOP cleanup.ps1"
