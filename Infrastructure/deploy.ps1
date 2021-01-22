@@ -18,7 +18,7 @@ $workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = $projectName
+$containerName = "$($projectName).$($releaseNumber).$($environment)"
 
 $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]
@@ -28,7 +28,8 @@ $XSAspace = $OctopusParameters["dataART.XSASpace"]
 # Copy project mtar file to work directory - c:\octopus\work\
 ###############################################################################
 
-Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "C:\octopus\work" -Force
+if (Test-Path c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).$($environment).mtar) { Remove-Item c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).$($environment).mtar }
+Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "C:\octopus\work\dataArt.$projectName.$releaseNumber.$environment.mtar" -Force
 
 ###############################################################################
 # Deploy:
@@ -41,7 +42,7 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 #
 ###############################################################################
 
-docker exec -it $containerName /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.mtar"
+docker exec -it $containerName /bin/sh -c "cp /data/dataArt.$projectName.$releaseNumber.$environment.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f dataArt.$projectName.$releaseNumber.$environment.mtar"
 
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"

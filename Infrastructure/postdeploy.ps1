@@ -15,7 +15,7 @@ $XSAPW = $args[0]
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = $projectName
+$containerName = "$($projectName).$($releaseNumber).$($environment)"
 
 $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]
@@ -64,11 +64,11 @@ if ($allLines -eq ' ')
 
 write-host "*** Get MTA information for $projectName"
 
-if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceName.txt }
 
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($projectName)-serviceName.txt"
+docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
-$File = Get-Content c:\Octopus\Work\$($projectName)-serviceName.txt
+$File = Get-Content c:\Octopus\Work\$($containerName)-serviceName.txt
 
 foreach ($line in $File)
 {
@@ -87,13 +87,11 @@ $serviceKey = $($serviceName) + "-sk"
 
 write-host "*** Setup servicekey $serviceKey"
 
-if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceKey.txt }
 
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($projectName)-serviceKey.txt"
-#docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs create-service-key $serviceName $serviceKey"
-#docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs service-key $serviceName $serviceKey > /data/$($projectName)-serviceKey.txt"
+docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
 
-$File = Get-Content c:\Octopus\Work\$($projectName)-serviceKey.txt
+$File = Get-Content c:\Octopus\Work\$($containerName)-serviceKey.txt
 
 foreach ($line in $File)
 {
@@ -114,17 +112,17 @@ $DBpw = $passwordArr[1]
 
 write-host "*** Run post-deployment SQL"
 
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
-Set-Content c:\Octopus\Work\$($projectName)-SQLoneLine.txt -value $allLines 
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoneLine.txt }
+Set-Content c:\Octopus\Work\$($containerName)-SQLoneLine.txt -value $allLines 
 
-docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
+docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
 ###############################################################################
 # Analyse SQL result
 ###############################################################################
 
-$fileContent = Get-Content c:\Octopus\Work\$($projectName)-SQLoutput.txt
+$fileContent = Get-Content c:\Octopus\Work\$($containerName)-SQLoutput.txt
 
 $fileContentArr = $fileContent.Split(@("`r`n", "`r", "`n"),[StringSplitOptions]::None)
 
@@ -148,10 +146,10 @@ write-host "*** Cleanup - delete servicekey"
 
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
-if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceName.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceKey.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoneLine.txt }
 
 write-host "*******************************************************************"
 write-host " STOP postdeploy.ps1"

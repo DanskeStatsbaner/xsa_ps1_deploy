@@ -13,7 +13,7 @@ write-host "*******************************************************************"
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = $projectName
+$containerName = "$($projectName).$($releaseNumber).$($environment)"
 
 ###############################################################################
 # Stop and delete containers
@@ -26,11 +26,11 @@ docker container prune -f
 # Delete workfiles
 ###############################################################################
 
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceName.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($projectName)-serviceKey.txt }
-if (Test-Path c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).mtar) { Remove-Item c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).mtar }
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoneLine.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-serviceName.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceName.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-serviceKey.txt) { Remove-Item c:\Octopus\Work\$($containerName)-serviceKey.txt }
+if (Test-Path c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).$($environment).mtar) { Remove-Item c:\Octopus\Work\dataArt.$($projectName).$($releaseNumber).$($environment).mtar }
 
 write-host "*******************************************************************"
 write-host " STOP cleanup.ps1"

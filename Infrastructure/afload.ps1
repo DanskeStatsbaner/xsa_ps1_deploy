@@ -17,7 +17,8 @@ $artifactoryPW = $args[0]
 $login = $OctopusParameters["artifactory.login"]
 $registry = $OctopusParameters["artifactory.registry"]
 $projectName = $OctopusParameters["Octopus.Project.Name"]
-$containerName = $projectName
+$releaseNumber = $OctopusParameters["Octopus.Release.Number"]
+$containerName = "$($projectName).$($releaseNumber).$($environment)"
 
 ###############################################################################
 # Stop and delete containers

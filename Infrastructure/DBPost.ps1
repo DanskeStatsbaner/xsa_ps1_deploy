@@ -17,6 +17,7 @@ $DBuser = $OctopusParameters["dataART.DBUser"]
 $workdirPath = $(pwd)
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
+$containerName = "$($projectName).$($releaseNumber).$($environment)"
 
 $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]
@@ -34,18 +35,18 @@ write-host "*** Run DB prepare SQL"
 
 $allLines = 'CALL "SYSTEM"."REVOKE_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
 
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoutput.txt }
-if (Test-Path c:\Octopus\Work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($projectName)-SQLoneLine.txt }
-Set-Content c:\Octopus\Work\$($projectName)-SQLoneLine.txt -value $allLines 
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoutput.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoutput.txt }
+if (Test-Path c:\Octopus\Work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\Octopus\Work\$($containerName)-SQLoneLine.txt }
+Set-Content c:\Octopus\Work\$($containerName)-SQLoneLine.txt -value $allLines 
 
-docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($projectName)-SQLoneLine.txt -O /data/$($projectName)-SQLoutput.txt"
+docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
 ###############################################################################
 # Cleanup - delete files
 ###############################################################################
 
-if (Test-Path c:\octopus\work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoutput.txt }
-if (Test-Path c:\octopus\work\$($projectName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($projectName)-SQLoneLine.txt }
+if (Test-Path c:\octopus\work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($containerName)-SQLoutput.txt }
+if (Test-Path c:\octopus\work\$($containerName)-SQLoneLine.txt) { Remove-Item c:\octopus\work\$($containerName)-SQLoneLine.txt }
 
 write-host "*******************************************************************"
 write-host " STOP DBPost.ps1"
