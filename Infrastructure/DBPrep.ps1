@@ -27,6 +27,10 @@ $HANAHost = $OctopusParameters["dataART.Host"]
 $HANAInstance = $OctopusParameters["dataART.Instance"]
 $HANADatabase = $OctopusParameters["dataART.Database"]
 
+$HANADeployCounter = $OctopusParameters["dataART.DeployCounter"]
+$HANADeployCounter = $HANADeployCounter + 1
+Set-OctopusVariable -name "dataART.DeployCounter" -value "$HANADeployCounter"
+
 ###############################################################################
 # Execute prepare SQL
 ###############################################################################

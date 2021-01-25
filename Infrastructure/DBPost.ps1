@@ -27,6 +27,19 @@ $HANAHost = $OctopusParameters["dataART.Host"]
 $HANAInstance = $OctopusParameters["dataART.Instance"]
 $HANADatabase = $OctopusParameters["dataART.Database"]
 
+$HANADeployCounter = $OctopusParameters["dataART.DeployCounter"]
+$HANADeployCounter = $HANADeployCounter - 1
+Set-OctopusVariable -name "dataART.DeployCounter" -value "$HANADeployCounter"
+
+if ($HANADeployCounter -ne 0) 
+{ 
+	write-host "*******************************************************************"
+	write-host " STOP DBPost.ps1"
+	write-host "*******************************************************************"
+	Exit
+}
+
+
 ###############################################################################
 # Execute prepare SQL
 ###############################################################################
