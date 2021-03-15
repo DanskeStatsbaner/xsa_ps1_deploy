@@ -35,6 +35,14 @@ $workdirPath = $pwd.ToString()
 $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
 $fullPath = "$($workdirPath)\Deployment\Test\$($environment)\*.txt"
+if (Test-Path c:$($fullPath)) {}
+else
+{
+   write-host "*******************************************************************"
+   write-host " STOP test.ps1 - no test SQL defined"
+   write-host "*******************************************************************"
+   Exit
+}
 
 $files = Get-ChildItem -Path c:$($fullPath) | sort $files.FullName
 

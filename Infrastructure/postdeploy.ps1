@@ -35,6 +35,14 @@ $workdirPath = $pwd.ToString()
 $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
 $fullPath = "$($workdirPath)\Deployment\PostDeploy\$($environment)\*.txt"
+if (Test-Path c:$($fullPath)) {}
+else
+{
+   write-host "*******************************************************************"
+   write-host " STOP postdeploy.ps1 - no post-deploy SQL defined"
+   write-host "*******************************************************************"
+   Exit
+}
 
 $files = Get-ChildItem -Path c:$($fullPath) | sort $files.FullName
 

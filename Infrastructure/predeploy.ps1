@@ -35,6 +35,14 @@ $workdirPath = $pwd.ToString()
 $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
 $fullPath = "$($workdirPath)\Deployment\PreDeploy\$($environment)\*.txt"
+if (Test-Path c:$($fullPath)) {}
+else
+{
+   write-host "*******************************************************************"
+   write-host " STOP predeploy.ps1 - no pre-deploy SQL defined"
+   write-host "*******************************************************************"
+   Exit
+}
 
 $files = Get-ChildItem -Path c:$($fullPath) | sort $files.FullName
 
