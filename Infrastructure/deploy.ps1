@@ -42,7 +42,7 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 #
 ###############################################################################
 
-docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar"
+docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar>$containerName.log"
 
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"
