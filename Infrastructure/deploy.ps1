@@ -42,8 +42,18 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 #
 ###############################################################################
 
-docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar>$containerName.log"
-
+docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar>C:\octopus\work\$containerName.log"
+$FileContent = Get-Content "C:\octopus\work\$containerName.log"
+$Matches = Select-String -InputObject $FileContent -Pattern "xs dmol -i" 
+$Start=$Matches.Line.IndexOf("xs dmol -i")
+if (-Not $Start.Equals(-1))
+{
+echo $Start
+$Lognr=$Matches.Line.Substring($Start+11,6)
+echo $Lognr
+}
+else
+{echo "Deploy OK"}
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"
 write-host "*******************************************************************"
