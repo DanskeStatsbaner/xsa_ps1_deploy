@@ -72,23 +72,23 @@ $Matches = Select-String -InputObject $FileContent -Pattern "$findErrorStatus"
 if ($Matches.LineNumber -gt 0)
 {
     $exitCode = 1
-}
 
-# Find the names of logfiles
-$FileContent = Get-Content "C:\octopus\work\$containerName.txt"
+    # Find the names of logfiles
+    $FileContent = Get-Content "C:\octopus\work\$containerName.txt"
 
-foreach($line in $FileContent) 
-{
-    $lineElements = $line -split " "
-    if ( ($lineElements.Count) -eq 9)
+    foreach($line in $FileContent) 
     {
-        $logFile = $lineElements[($lineElements.Count)-1]
+        $lineElements = $line -split " "
+        if ( ($lineElements.Count) -eq 9)
+        {
+            $logFile = $lineElements[($lineElements.Count)-1]
 
-        write-host "*******************************************************************"
-        write-host " Logfile: $logFile "
-        write-host "*******************************************************************"
+            write-host "*******************************************************************"
+            write-host " Logfile: $logFile "
+            write-host "*******************************************************************"
 
-        docker exec -it $containerName /bin/sh -c "cd $dmolDir . && cat $logFile ." 
+            docker exec -it $containerName /bin/sh -c "cd $dmolDir . && cat $logFile ." 
+        }
     }
 }
 
