@@ -57,7 +57,8 @@ $Matches = Select-String -InputObject $FileContent -Pattern "xs dmol -i"
 $Start=$Matches.Line.IndexOf("xs dmol -i")
 if (-Not $Start.Equals(-1))
 {
-    $logNo=$Matches.Line.Substring($Start+11,6)
+    $end=$Matches.Line.Substring($Start+12,10).IndexOf("to")
+    $logNo=$Matches.Line.Substring($Start+11,$end-1)
     docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
     $dmolDir = "./mta-op-$logNo"
     docker exec -it $containerName /bin/sh -c "cd $dmolDir . && ls -la . > /data/$containerName.txt "
