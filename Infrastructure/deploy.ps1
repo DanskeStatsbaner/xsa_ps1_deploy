@@ -42,21 +42,62 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 #
 ###############################################################################
 
-docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar"
+docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
 
-#docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar>C:\octopus\work\$containerName.log"
-#$FileContent = Get-Content "C:\octopus\work\$containerName.log"
-#$Matches = Select-String -InputObject $FileContent -Pattern "xs dmol -i" 
-#$Start=$Matches.Line.IndexOf("xs dmol -i")
-#if (-Not $Start.Equals(-1))
-#{
-#echo $Start
-#$Lognr=$Matches.Line.Substring($Start+11,6)
-#echo $Lognr
-#}
-#else
-#{echo "Deploy OK"}
+# Get the log and put it into the Octopus log
+$FileContent = Get-Content "C:\octopus\work\$containerName.log"
+
+write-host "*******************************************************************"
+write-host " Deployment log"
+write-host "*******************************************************************"
+write-host $FileContent
+
+# Find the log number and create a file with the names of the logs
+$Matches = Select-String -InputObject $FileContent -Pattern "xs dmol -i" 
+$Start=$Matches.Line.IndexOf("xs dmol -i")
+if (-Not $Start.Equals(-1))
+{
+    $logNo=$Matches.Line.Substring($Start+11,6)
+    docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
+    $dmolDir = "./mta-op-$logNo"
+    docker exec -it $containerName /bin/sh -c "cd $dmolDir . && ls -la . > /data/$containerName.txt "
+}
+
+# Determine if the deploy was as success or a failure
+$findErrorStatus = "xs deploy -i " + $logNo + " -a retry"
+
+$Matches = Select-String -InputObject $FileContent -Pattern "$findErrorStatus" 
+$Start=$Matches.Line.IndexOf("$findErrorStatus")
+if (-Not $Start.Equals(-1))
+{
+#   save exitcode based on the log
+    $exitCode = 1
+}
+
+# Find the names of logfiles
+$FileContent = Get-Content "C:\octopus\work\$containerName.txt"
+
+foreach($line in $FileContent) 
+{
+    $lineElements = $line -split " "
+    if ( ($lineElements.Count) -eq 9)
+    {
+        $logFile = $lineElements[($lineElements.Count)-1]
+
+        write-host "*******************************************************************"
+        write-host " Logfile: $logFile "
+        write-host "*******************************************************************"
+
+        docker exec -it $containerName /bin/sh -c "cd $dmolDir . && cat $logFile ." 
+    }
+}
+
+# cleanup
+if (Test-Path c:\Octopus\Work\$($containerName).log) { Remove-Item c:\Octopus\Work\$($containerName).log }
+if (Test-Path c:\Octopus\Work\$($containerName).txt) { Remove-Item c:\Octopus\Work\$($containerName).txt }
 
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"
 write-host "*******************************************************************"
+
+Exit $exitCode
