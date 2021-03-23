@@ -69,8 +69,7 @@ $exitCode = 0
 $findErrorStatus = "xs deploy -i " + $logNo + " -a retry"
 
 $Matches = Select-String -InputObject $FileContent -Pattern "$findErrorStatus" 
-$Start=$Matches.Line.IndexOf("$findErrorStatus")
-if (-Not $Start.Equals(-1))
+if ($Matches.LineNumber -gt 0)
 {
     $exitCode = 1
 }
