@@ -64,13 +64,13 @@ if (-Not $Start.Equals(-1))
 }
 
 # Determine if the deploy was as success or a failure
+$exitCode = 0
 $findErrorStatus = "xs deploy -i " + $logNo + " -a retry"
 
 $Matches = Select-String -InputObject $FileContent -Pattern "$findErrorStatus" 
 $Start=$Matches.Line.IndexOf("$findErrorStatus")
 if (-Not $Start.Equals(-1))
 {
-#   save exitcode based on the log
     $exitCode = 1
 }
 
