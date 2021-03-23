@@ -59,9 +59,6 @@ if (-Not $Start.Equals(-1))
 {
     $end=$Matches.Line.Substring($Start+12,10).IndexOf("to")
     $logNo=$Matches.Line.Substring($Start+11,$end-1)
-    docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
-    $dmolDir = "./mta-op-$logNo"
-    docker exec -it $containerName /bin/sh -c "cd $dmolDir . && ls -la . > /data/$containerName.txt "
 }
 
 # Determine if the deploy was as success or a failure
@@ -72,6 +69,11 @@ $Matches = Select-String -InputObject $FileContent -Pattern "$findErrorStatus"
 if ($Matches.LineNumber -gt 0)
 {
     $exitCode = 1
+
+    # Download logfiles
+    docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
+    $dmolDir = "./mta-op-$logNo"
+    docker exec -it $containerName /bin/sh -c "cd $dmolDir . && ls -la . > /data/$containerName.txt "
 
     # Find the names of logfiles
     $FileContent = Get-Content "C:\octopus\work\$containerName.txt"
