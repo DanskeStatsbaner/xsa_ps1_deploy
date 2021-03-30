@@ -78,6 +78,11 @@ if ($Matches.LineNumber -gt 0)
     # Find the names of logfiles
     $FileContent = Get-Content "C:\octopus\work\$containerName.txt"
 
+    write-host "*******************************************************************"
+    write-host " Log files generated:"
+    write-host "*******************************************************************"
+    write-host $FileContent
+
     foreach($line in $FileContent) 
     {
         $lineElements = $line -split " "
