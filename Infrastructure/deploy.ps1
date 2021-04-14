@@ -74,30 +74,6 @@ if ($Matches.LineNumber -gt 0)
     docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
     $dmolDir = "./mta-op-$logNo"
     docker exec -it $containerName /bin/sh -c "cd $dmolDir . && cat * . "
-#    docker exec -it $containerName /bin/sh -c "cd $dmolDir . && ls -la . > /data/$containerName.txt "
-#
-#    # Find the names of logfiles
-#    $FileContent = Get-Content "C:\octopus\work\$containerName.txt"
-#
-#    write-host "*******************************************************************"
-#    write-host " Log files generated:"
-#    write-host "*******************************************************************"
-#    write-host $FileContent
-#
-#    foreach($line in $FileContent) 
-#    {
-#        $lineElements = $line -split " "
-#        if ( ($lineElements.Count) -eq 9)
-#        {
-#            $logFile = $lineElements[($lineElements.Count)-1]
-#
-#            write-host "*******************************************************************"
-#            write-host " Logfile: $logFile "
-#            write-host "*******************************************************************"
-#
-#            docker exec -it $containerName /bin/sh -c "cd $dmolDir . && cat $logFile ." 
-#        }
-#    }
 }
 
 # cleanup
