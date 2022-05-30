@@ -4,7 +4,7 @@ $environment = $OctopusParameters["Octopus.Environment.Name"]
 if($environment -eq "sit") { Exit }
 
 write-host "*******************************************************************"
-write-host " START afload.ps1"
+write-host " START Xafload.ps1"
 write-host "*******************************************************************"
 
 ###############################################################################
@@ -38,5 +38,5 @@ docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 docker run -v $OctopusWorkDir:/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 
 write-host "*******************************************************************"
-write-host " STOP afload.ps1"
+write-host " STOP Xafload.ps1"
 write-host "*******************************************************************"
