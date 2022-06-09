@@ -27,11 +27,11 @@ $XSAspace = $OctopusParameters["dataART.XSASpace"]
 $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 
 ###############################################################################
-# Copy project mtar file to work directory - $OctopusWorkDir\
+# Copy project mtar file to work directory - $($OctopusWorkDir)\
 ###############################################################################
 
-if (Test-Path $OctopusWorkDir\$($containerName).mtar) { Remove-Item $OctopusWorkDir\$($containerName).mtar }
-Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "$OctopusWorkDir\$containerName.mtar" -Force
+if (Test-Path $($OctopusWorkDir)\$($containerName).mtar) { Remove-Item $($OctopusWorkDir)\$($containerName).mtar }
+Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "$($OctopusWorkDir)\$containerName.mtar" -Force
 
 ###############################################################################
 # Deploy:
@@ -47,7 +47,7 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
 
 # Get the log and put it into the Octopus log
-$FileContent = Get-Content "$OctopusWorkDir\$containerName.log"
+$FileContent = Get-Content "$($OctopusWorkDir)\$containerName.log"
 
 write-host "*******************************************************************"
 write-host " Deployment log"
@@ -79,8 +79,8 @@ if ($Matches.LineNumber -gt 0)
 }
 
 # cleanup
-if (Test-Path $OctopusWorkDir\$($containerName).log) { Remove-Item $OctopusWorkDir\$($containerName).log }
-if (Test-Path $OctopusWorkDir\$($containerName).txt) { Remove-Item $OctopusWorkDir\$($containerName).txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName).log) { Remove-Item $($OctopusWorkDir)\$($containerName).log }
+if (Test-Path $($OctopusWorkDir)\$($containerName).txt) { Remove-Item $($OctopusWorkDir)\$($containerName).txt }
 
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"

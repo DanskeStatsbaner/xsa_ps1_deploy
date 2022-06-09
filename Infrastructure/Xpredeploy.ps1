@@ -74,11 +74,11 @@ if ($allLines -eq ' ')
 
 write-host "*** Get MTA information for $projectName"
 
-if (Test-Path $OctopusWorkDir\$($containerName)-serviceName.txt) { Remove-Item $OctopusWorkDir\$($containerName)-serviceName.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-serviceName.txt }
 
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
-$File = Get-Content $OctopusWorkDir\$($containerName)-serviceName.txt
+$File = Get-Content $($OctopusWorkDir)\$($containerName)-serviceName.txt
 
 foreach ($line in $File)
 {
@@ -97,11 +97,11 @@ $serviceKey = $($serviceName) + "-sk"
 
 write-host "*** Setup servicekey $serviceKey"
 
-if (Test-Path $OctopusWorkDir\$($containerName)-serviceKey.txt) { Remove-Item $OctopusWorkDir\$($containerName)-serviceKey.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-serviceKey.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-serviceKey.txt }
 
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
 
-$File = Get-Content $OctopusWorkDir\$($containerName)-serviceKey.txt
+$File = Get-Content $($OctopusWorkDir)\$($containerName)-serviceKey.txt
 
 foreach ($line in $File)
 {
@@ -130,9 +130,9 @@ if ($DBuser -eq ' ')
 
 write-host "*** Run pre-deployment SQL"
 
-if (Test-Path $OctopusWorkDir\$($containerName)-SQLoutput.txt) { Remove-Item $OctopusWorkDir\$($containerName)-SQLoutput.txt }
-if (Test-Path $OctopusWorkDir\$($containerName)-SQLoneLine.txt) { Remove-Item $OctopusWorkDir\$($containerName)-SQLoneLine.txt }
-Set-Content $OctopusWorkDir\$($containerName)-SQLoneLine.txt -value $allLines 
+if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoutput.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoutput.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
+Set-Content $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt -value $allLines 
 
 docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
@@ -140,7 +140,7 @@ docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance 
 # Analyse SQL result
 ###############################################################################
 
-$fileContent = Get-Content $OctopusWorkDir\$($containerName)-SQLoutput.txt
+$fileContent = Get-Content $($OctopusWorkDir)\$($containerName)-SQLoutput.txt
 
 $fileContentArr = $fileContent.Split(@("`r`n", "`r", "`n"),[StringSplitOptions]::None)
 
@@ -164,10 +164,10 @@ write-host "*** Cleanup - delete servicekey"
 
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
-if (Test-Path $OctopusWorkDir\$($containerName)-serviceName.txt) { Remove-Item $OctopusWorkDir\$($containerName)-serviceName.txt }
-if (Test-Path $OctopusWorkDir\$($containerName)-serviceKey.txt) { Remove-Item $OctopusWorkDir\$($containerName)-serviceKey.txt }
-if (Test-Path $OctopusWorkDir\$($containerName)-SQLoneLine.txt) { Remove-Item $OctopusWorkDir\$($containerName)-SQLoutput.txt }
-if (Test-Path $OctopusWorkDir\$($containerName)-SQLoneLine.txt) { Remove-Item $OctopusWorkDir\$($containerName)-SQLoneLine.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-serviceName.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-serviceKey.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-serviceKey.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoutput.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
 
 write-host "*******************************************************************"
 write-host " STOP predeploy.ps1"

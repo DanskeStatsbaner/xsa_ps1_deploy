@@ -35,7 +35,7 @@ docker container prune -f
 
 docker login -u $login -p $artifactoryPW   $registry
 docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
-docker run -v $OctopusWorkDir:/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+docker run -v $($OctopusWorkDir):/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 
 write-host "*******************************************************************"
 write-host " STOP Xafload.ps1"

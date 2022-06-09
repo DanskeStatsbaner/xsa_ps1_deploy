@@ -41,8 +41,8 @@ write-host "*** Run DB prepare SQL"
 
 $allLines = 'CALL "SYSTEM"."GRANT_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
 
-if (Test-Path $OctopusWorkDir\$($containerName)-SQLoneLine.txt) { Remove-Item $OctopusWorkDir\$($containerName)-SQLoneLine.txt }
-Set-Content $OctopusWorkDir\$($containerName)-SQLoneLine.txt -value $allLines 
+if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
+Set-Content $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt -value $allLines 
 
 docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt"
 
@@ -50,7 +50,7 @@ docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance 
 # Cleanup - delete files
 ###############################################################################
 
-if (Test-Path $OctopusWorkDir\$($containerName)-SQLoneLine.txt) { Remove-Item $OctopusWorkDir\$($containerName)-SQLoneLine.txt }
+if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
 
 write-host "*******************************************************************"
 write-host " STOP DBPrep.ps1"
