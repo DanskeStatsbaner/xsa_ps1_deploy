@@ -35,6 +35,10 @@ write-host "*** Get SQL from project"
 
 $workdirPath = $pwd.ToString()
 write-host "workdirPath: " $workdirPath
+
+$allFiles = get-childitem "$workdirPath/*.*"
+foreach($file in $allFiles ) { write-host "File: " $file.Name }
+
 $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("\Deployment")-2)
 
 $fullPath = "$($workdirPath)\Deployment\PreDeploy\$($environment)\*.txt"
