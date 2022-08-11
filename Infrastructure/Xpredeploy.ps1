@@ -39,7 +39,7 @@ write-host "workdirPath: " $workdirPath
 $allFiles = get-childitem "$workdirPath" -Recurse
 foreach($file in $allFiles ) { write-host "File: " $file.FullName }
 
-$workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("/Deployment")-2)
+# $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("/Deployment")-2)
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)/*.txt"
 if (Test-Path $($fullPath)) {}
