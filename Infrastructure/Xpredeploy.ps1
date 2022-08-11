@@ -51,7 +51,8 @@ else
    Exit
 }
 
-$files = Get-ChildItem -Path $($fullPath) | sort $files.FullName
+$fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)
+$files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
 
 $arrFiles = @();
 
@@ -59,8 +60,6 @@ foreach($file in $files )
 {
     write-host "File: " $file.FullName
 }
-
-exit 1
 
 foreach($file in $files ) 
 {
