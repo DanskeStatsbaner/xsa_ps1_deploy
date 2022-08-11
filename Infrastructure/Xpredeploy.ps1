@@ -79,7 +79,7 @@ if ($allLines -eq ' ')
 ###############################################################################
 
 write-host "*** Get MTA information for $projectName"
-workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
+$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
 write-host "WorkdirPath: " $workdirPath
 #if (Test-Path $($OctopusWorkDir)/$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)/$($containerName)-serviceName.txt }
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
