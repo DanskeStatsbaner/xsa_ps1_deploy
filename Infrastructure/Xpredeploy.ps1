@@ -106,7 +106,7 @@ $serviceKey = $($serviceName) + "-sk"
 write-host "*** Setup servicekey $serviceKey"
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceKey.txt"
 
-if (Test-Path $($workdirPath) { Remove-Item $($workdirPath) }
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
 
