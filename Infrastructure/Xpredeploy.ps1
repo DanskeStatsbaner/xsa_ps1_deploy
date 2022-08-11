@@ -58,11 +58,6 @@ $arrFiles = @();
 
 foreach($file in $files ) 
 {
-    write-host "File: " $file.FullName
-}
-
-foreach($file in $files ) 
-{
     $fileContent = Get-Content $file.FullName
     $allLines = [string]::join(" ",($fileContent.Split("`n")))
     $allLines = [string]::join(" ",($allLines.Split("`r")))
@@ -84,8 +79,10 @@ if ($allLines -eq ' ')
 ###############################################################################
 
 write-host "*** Get MTA information for $projectName"
-
-if (Test-Path $($OctopusWorkDir)/$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)/$($containerName)-serviceName.txt }
+workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
+write-host "WorkdirPath: " $workdirPath
+#if (Test-Path $($OctopusWorkDir)/$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)/$($containerName)-serviceName.txt }
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
 docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
