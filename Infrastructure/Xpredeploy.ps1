@@ -51,7 +51,7 @@ else
    Exit
 }
 
-$fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)
+$fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
 $files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
 
 $arrFiles = @();
