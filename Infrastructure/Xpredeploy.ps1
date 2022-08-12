@@ -55,12 +55,16 @@ $arrFiles = @();
 foreach($file in $files ) 
 {
     $fileContent = Get-Content $file.FullName
+    write-host "file.FullName: " $file.FullName
+    write-host "fileContent: " $fileContent
     $allLines = [string]::join(" ",($fileContent.Split("`n")))
     $allLines = [string]::join(" ",($allLines.Split("`r")))
+    write-host "allLines i foreach: " $allLines
     $arrFiles += $allLines;
 }
 
 $allLines = [string]::join(" ", $arrFiles)
+write-host "allLines efter foreach: " $allLines
 
 if ($allLines -eq ' ')
 {
@@ -138,12 +142,7 @@ $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 Set-Content $($workdirPath) -value $allLines 
 
-write-host "HANAHost : " $HANAHost
-write-host "HANAInstance: " $HANAInstance
-write-host "HANADatabase: " $HANADatabase
-write-host "DBuser: " $DBuser
-write-host "DBpw: " $DBpw
-write-host "allLines: " $allLines
+write-host "allLines before hdbsql: " $allLines
 
 docker exec -t $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
