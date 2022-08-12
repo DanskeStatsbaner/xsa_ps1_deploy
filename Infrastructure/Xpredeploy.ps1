@@ -34,7 +34,7 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 write-host "*** Get SQL from project"
 
 $workdirPath = $pwd.ToString()
-
+write-host "workdirPath : " $workdirPath
 $allFiles = get-childitem "$workdirPath" -include *.txt -Recurse
 foreach($file in $allFiles) 
 {
@@ -55,9 +55,9 @@ else
 }
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
+write-host "fullPath : " $fullPath
 # $files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
-$files = Get-ChildItem $fullPath -Include *.txt | sort $files.FullName
-write-host "files efter get-childitem: " $files
+$files = Get-ChildItem $fullPath -Include *.txt
 
 $arrFiles = @();
 
