@@ -48,7 +48,8 @@ else
 }
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
-$files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
+# $files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
+$files = Get-ChildItem $fullPath -Include *.txt | sort $files.FullName
 write-host "files efter get-childitem: " $files
 
 $arrFiles = @();
