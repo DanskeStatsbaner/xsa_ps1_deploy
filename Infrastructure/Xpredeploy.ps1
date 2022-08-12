@@ -57,14 +57,19 @@ else
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
 write-host "fullPath : " $fullPath
 # $files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
-$files = Get-ChildItem "$fullPath" -Include *.txt -Recurse | sort $files.FullName
+$files = get-childitem "$fullPath" -include *.txt -Recurse
 
 $arrFiles = @();
 
 foreach($file in $files) 
 {
-    $fileContent = Get-Content $file.FullName
     write-host "file.FullName: " $file.FullName
+}
+
+foreach($file in $files) 
+{
+    write-host "file.FullName: " $file.FullName
+    $fileContent = Get-Content $file.FullName
     write-host "fileContent: " $fileContent
     $allLines = [string]::join(" ",($fileContent.Split("`n")))
     $allLines = [string]::join(" ",($allLines.Split("`r")))
