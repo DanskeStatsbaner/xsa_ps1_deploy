@@ -34,15 +34,6 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 write-host "*** Get SQL from project"
 
 $workdirPath = $pwd.ToString()
-write-host "workdirPath : " $workdirPath
-$allFiles = get-childitem "$workdirPath" -include *.txt -Recurse
-foreach($file in $allFiles) 
-{
-    $fileContent = Get-Content $file.FullName
-    write-host "file.FullName: " $file.FullName
-    write-host "fileContent :" $fileContent
-}
-
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)/*.txt"
 if (Test-Path $($fullPath)) {}
@@ -55,22 +46,13 @@ else
 }
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
-write-host "fullPath : " $fullPath
-# $files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
-$files = get-childitem "$fullPath" -include *.txt -Recurse
+$files = get-childitem "$fullPath" -include *.txt -Recurse | sort $files.FullName
 
 $arrFiles = @();
 
 foreach($file in $files) 
 {
-    write-host "file.FullName: " $file.FullName
-}
-
-foreach($file in $files) 
-{
-    write-host "file.FullName: " $file.FullName
     $fileContent = Get-Content $file.FullName
-    write-host "fileContent: " $fileContent
     $allLines = [string]::join(" ",($fileContent.Split("`n")))
     $allLines = [string]::join(" ",($allLines.Split("`r")))
     write-host "allLines i foreach: " $allLines
@@ -78,7 +60,6 @@ foreach($file in $files)
 }
 
 $allLines = [string]::join(" ", $arrFiles)
-write-host "allLines efter foreach: " $allLines
 
 if ($allLines -eq ' ')
 {
@@ -96,7 +77,6 @@ write-host "*** Get MTA information for $projectName"
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-#docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
 $File = Get-Content $($workdirPath)
@@ -156,8 +136,6 @@ $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 Set-Content $($workdirPath) -value $allLines 
 
-write-host "allLines before hdbsql: " $allLines
-
 docker exec -t $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
 ###############################################################################
@@ -188,6 +166,7 @@ ForEach($fileLine in $fileContentArr)
 write-host "*** Cleanup - delete servicekey"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
+docker exec -t $containerName /bin/sh -c "chmod 777"
 
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
