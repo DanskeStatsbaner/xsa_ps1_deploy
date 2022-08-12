@@ -46,7 +46,7 @@ else
 }
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
-$files = get-childitem "$fullPath" -include *.txt -Recurse | sort $files.FullName
+$files = get-childitem "$fullPath" -include *.txt -Recurse
 
 $arrFiles = @();
 
