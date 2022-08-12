@@ -18,21 +18,22 @@ $containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
 $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 
 ###############################################################################
+# Delete workfiles
+###############################################################################
+
+$workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
+$workdirPath = "$($OctopusWorkDir)/$($containerName).mtar"
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
+
+docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
+
+###############################################################################
 # Stop and delete containers
 ###############################################################################
 
 if ($(docker container ls -aq -f name="$containerName").length -gt 0){ docker container stop $($containerName) }
 docker container prune -f
-
-###############################################################################
-# Delete workfiles
-###############################################################################
-
-if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoutput.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoutput.txt }
-if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
-if (Test-Path $($OctopusWorkDir)\$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-serviceName.txt }
-if (Test-Path $($OctopusWorkDir)\$($containerName)-serviceKey.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-serviceKey.txt }
-if (Test-Path $($OctopusWorkDir)\$($containerName).mtar) { Remove-Item $($OctopusWorkDir)\$($containerName).mtar }
 
 write-host "*******************************************************************"
 write-host " STOP cleanup.ps1"

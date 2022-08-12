@@ -14,7 +14,7 @@ write-host "*******************************************************************"
 $XSAPW = $args[0]
 
 $workdirPath = $pwd.ToString()
-$workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
+# $workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
@@ -29,9 +29,11 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 ###############################################################################
 # Copy project mtar file to work directory - $($OctopusWorkDir)\
 ###############################################################################
+$workdirPath = "$($OctopusWorkDir)/$($containerName).mtar"
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-if (Test-Path $($OctopusWorkDir)\$($containerName).mtar) { Remove-Item $($OctopusWorkDir)\$($containerName).mtar }
-Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "$($OctopusWorkDir)\$containerName.mtar" -Force
+$sourcedirPath = "$workdirPath/dataArt.$projectName.$releaseNumber.mtar"
+Copy-Item "$($sourcedirPath)" -Destination "$($workdirPath)" -Force
 
 ###############################################################################
 # Deploy:
@@ -47,7 +49,8 @@ Copy-Item "$workdirPath\dataArt.$projectName.$releaseNumber.mtar" -Destination "
 docker exec -it $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
 
 # Get the log and put it into the Octopus log
-$FileContent = Get-Content "$($OctopusWorkDir)\$containerName.log"
+$workdirPath = "$($OctopusWorkDir)/$containerName.log"
+$FileContent = Get-Content "$($workdirPath)"
 
 write-host "*******************************************************************"
 write-host " Deployment log"
@@ -79,8 +82,12 @@ if ($Matches.LineNumber -gt 0)
 }
 
 # cleanup
-if (Test-Path $($OctopusWorkDir)\$($containerName).log) { Remove-Item $($OctopusWorkDir)\$($containerName).log }
-if (Test-Path $($OctopusWorkDir)\$($containerName).txt) { Remove-Item $($OctopusWorkDir)\$($containerName).txt }
+
+docker exec -t $containerName /bin/sh -c "rm -fv *.log"
+
+$workdirPath = "$($OctopusWorkDir)\$($containerName).txt"
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
+
 
 write-host "*******************************************************************"
 write-host " STOP deploy.ps1"

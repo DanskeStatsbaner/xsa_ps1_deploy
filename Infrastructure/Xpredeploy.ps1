@@ -167,14 +167,10 @@ write-host "*** Cleanup - delete servicekey"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
-$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
-$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceKey.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
-$workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoutput.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
+
+docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
 
 write-host "*******************************************************************"
 write-host " STOP predeploy.ps1"

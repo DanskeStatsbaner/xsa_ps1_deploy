@@ -50,9 +50,9 @@ write-host "*** Run DB prepare SQL"
 
 $allLines = 'CALL "SYSTEM"."REVOKE_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
 
-if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoutput.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoutput.txt }
-if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
-Set-Content $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt -value $allLines 
+$workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) ?);'
+Set-Content $($workdirPath) -value $allLines 
 
 docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
@@ -60,8 +60,10 @@ docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance 
 # Cleanup - delete files
 ###############################################################################
 
-if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoutput.txt }
-if (Test-Path $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt) { Remove-Item $($OctopusWorkDir)\$($containerName)-SQLoneLine.txt }
+$workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) ?);'
+
+docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
 
 write-host "*******************************************************************"
 write-host " STOP DBPost.ps1"
