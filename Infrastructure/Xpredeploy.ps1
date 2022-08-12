@@ -138,6 +138,13 @@ $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 Set-Content $($workdirPath) -value $allLines 
 
+write-host "HANAHost : " $HANAHost
+write-host "HANAInstance: " $HANAInstance
+write-host "HANADatabase: " $HANADatabase
+write-host "DBuser: " $DBuser
+write-host "DBpw: " $DBpw
+write-host "allLines: " $allLines
+
 docker exec -t $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
 ###############################################################################
