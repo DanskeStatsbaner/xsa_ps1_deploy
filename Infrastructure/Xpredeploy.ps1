@@ -47,6 +47,7 @@ else
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
 $files = get-childitem "$fullPath" -include *.txt -Recurse
+sort $files.FullName 
 
 $arrFiles = @();
 
@@ -166,7 +167,7 @@ ForEach($fileLine in $fileContentArr)
 write-host "*** Cleanup - delete servicekey"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
-docker exec -t $containerName /bin/sh -c "chmod 777"
+docker exec -t $containerName /bin/sh -c "chmod -R 777 $OctopusWorkDir"
 
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
