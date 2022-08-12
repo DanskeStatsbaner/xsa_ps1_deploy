@@ -34,12 +34,8 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 write-host "*** Get SQL from project"
 
 $workdirPath = $pwd.ToString()
-write-host "workdirPath: " $workdirPath
 
 $allFiles = get-childitem "$workdirPath" -Recurse
-foreach($file in $allFiles ) { write-host "File: " $file.FullName }
-
-# $workdirPath = $workdirPath.Substring(2, $workdirPath.IndexOf("/Deployment")-2)
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)/*.txt"
 if (Test-Path $($fullPath)) {}
@@ -80,11 +76,10 @@ if ($allLines -eq ' ')
 
 write-host "*** Get MTA information for $projectName"
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
-write-host "WorkdirPath: " $workdirPath
-#if (Test-Path $($OctopusWorkDir)/$($containerName)-serviceName.txt) { Remove-Item $($OctopusWorkDir)/$($containerName)-serviceName.txt }
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
+#docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
+docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
 $File = Get-Content $($workdirPath)
 
@@ -105,10 +100,9 @@ $serviceKey = $($serviceName) + "-sk"
 
 write-host "*** Setup servicekey $serviceKey"
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceKey.txt"
-
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
+docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
 
 $File = Get-Content $($workdirPath)
 
@@ -144,7 +138,7 @@ $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 Set-Content $($workdirPath) -value $allLines 
 
-docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
+docker exec -t $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
 ###############################################################################
 # Analyse SQL result
@@ -173,7 +167,7 @@ ForEach($fileLine in $fileContentArr)
 
 write-host "*** Cleanup - delete servicekey"
 
-docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
+docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f"
 
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
