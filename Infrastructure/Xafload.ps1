@@ -37,6 +37,7 @@ docker login -u $login -p $artifactoryPW   $registry
 docker pull artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 # docker run -v $($OctopusWorkDir):/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
 docker run -v /var/lib/jenkins/SAPHanaOctopusWork:/data --name $containerName --rm -t -d artifactory.azure.dsb.dk/docker/xsa_cli_deploy
+docker exec -t $containerName /bin/sh -c "chmod -R 777 data"
 
 write-host "*******************************************************************"
 write-host " STOP Xafload.ps1"
