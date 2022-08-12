@@ -49,10 +49,11 @@ else
 
 $fullPath = "$($workdirPath)/Deployment/PreDeploy/$($environment)"
 $files = Get-ChildItem -Path $($fullPath) -Include *.txt | sort $files.FullName
+write-host "files efter get-childitem: " $files
 
 $arrFiles = @();
 
-foreach($file in $files ) 
+foreach($file in $files) 
 {
     $fileContent = Get-Content $file.FullName
     write-host "file.FullName: " $file.FullName
