@@ -35,11 +35,12 @@ write-host "*** Get SQL from project"
 
 $workdirPath = $pwd.ToString()
 
-$allFiles = get-childitem "$workdirPath" -Recurse
+$allFiles = get-childitem "$workdirPath" -include *.txt -Recurse
 foreach($file in $allFiles) 
 {
     $fileContent = Get-Content $file.FullName
     write-host "file.FullName: " $file.FullName
+    write-host "fileContent :" $fileContent
 }
 
 
