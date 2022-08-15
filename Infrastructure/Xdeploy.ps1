@@ -46,7 +46,7 @@ if (Test-Path $($targetDirPath)) { Remove-Item $($targetDirPath) }
 
 write-host "Write into : " $targetDirPath
 
-Copy-Item "$($sourceDirPath)" -Destination "$($targetDirPath)" -Force
+Copy-Item "$($workdirPath)" -include "dataArt.$projectNameLower.$releaseNumber.mtar"  -Destination "$($targetDirPath)" -Force
 
 $fullPath = "$($OctopusWorkDir)"
 $files = get-childitem "$fullPath" -include *.* -Recurse
