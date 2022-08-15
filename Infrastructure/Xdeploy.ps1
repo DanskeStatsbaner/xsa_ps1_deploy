@@ -17,7 +17,6 @@ $workdirPath = $pwd.ToString()
 # $workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
-$projectName = $projectName.ToLower()
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 $containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
 
@@ -30,25 +29,30 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 ###############################################################################
 # Copy project mtar file to work directory - $($OctopusWorkDir)\
 ###############################################################################
-# $sourcedirPath = "$($workdirPath)/dataArt.$projectName.$releaseNumber.mtar"
+$projectNameLower = $projectName.ToLower()
+$sourceDirPath = "$($workdirPath)/dataArt.$projectNameLower.$releaseNumber.mtar"
 
-$fullPath = "$($workdirPath)"
+write-host "Read from : " $sourceDirPath
+
+$fullPath = "$($sourceDirPath)"
 $files = get-childitem "$fullPath" -include *.* -Recurse
 foreach($file in $files) 
 {
-    write-host "Workdir mtar : " $file.FullName
+    write-host "sourceDirPath : " $file.FullName
 }
 
 $targetDirPath = "$($OctopusWorkDir)/$($containerName).mtar"
 if (Test-Path $($targetDirPath)) { Remove-Item $($targetDirPath) }
 
-Copy-Item "$($workdirPath)" -include "*.mtar" -Destination "$($targetDirPath)" -Force -Recurse
+write-host "Write into : " $targetDirPath
+
+Copy-Item "$($sourceDirPath)" -Destination "$($targetDirPath)" -Force
 
 $fullPath = "$($OctopusWorkDir)"
 $files = get-childitem "$fullPath" -include *.* -Recurse
 foreach($file in $files) 
 {
-    write-host "targetdir mtar : " $file.FullName
+    write-host "targetdir : " $file.FullName
 }
 
 ###############################################################################
