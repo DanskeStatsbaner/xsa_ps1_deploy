@@ -31,7 +31,7 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 ###############################################################################
 # $sourcedirPath = "$($workdirPath)/dataArt.$projectName.$releaseNumber.mtar"
 
-$fullPath = "$($workdirPath)""
+$fullPath = "$($workdirPath)"
 $files = get-childitem "$fullPath" -include *.mtar -Recurse
 foreach($file in $files) 
 {
@@ -43,7 +43,7 @@ if (Test-Path $($targetDirPath)) { Remove-Item $($targetDirPath) }
 
 Copy-Item "$($workdirPath)" -include "*.mtar" -Destination "$($targetDirPath)" -Force -Recurse
 
-$fullPath = "$($OctopusWorkDir)""
+$fullPath = "$($OctopusWorkDir)"
 $files = get-childitem "$fullPath" -include *.mtar -Recurse
 foreach($file in $files) 
 {
