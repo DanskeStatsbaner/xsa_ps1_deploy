@@ -37,7 +37,7 @@ foreach($file in $files)
 }
 
 $projectNameLower = $projectName.ToLower()
-$sourceDirPath = "$($workdirPath)/dataArt.$projectNameLower.$releaseNumber.mtar"
+$sourceDirPath = "$($workdirPath)/dataART.$projectNameLower.$releaseNumber.mtar"
 
 write-host "Read from : " $sourceDirPath
 
