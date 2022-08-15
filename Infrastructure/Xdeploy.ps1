@@ -29,17 +29,17 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 ###############################################################################
 # Copy project mtar file to work directory - $($OctopusWorkDir)\
 ###############################################################################
-$projectNameLower = $projectName.ToLower()
-$sourceDirPath = "$($workdirPath)/dataArt.$projectNameLower.$releaseNumber.mtar"
-
-write-host "Read from : " $sourceDirPath
-
-$fullPath = "$($sourceDirPath)"
+$fullPath = "$($workdirPath)"
 $files = get-childitem "$fullPath" -include *.* -Recurse
 foreach($file in $files) 
 {
     write-host "sourceDirPath : " $file.FullName
 }
+
+$projectNameLower = $projectName.ToLower()
+$sourceDirPath = "$($workdirPath)/dataArt.$projectNameLower.$releaseNumber.mtar"
+
+write-host "Read from : " $sourceDirPath
 
 $targetDirPath = "$($OctopusWorkDir)/$($containerName).mtar"
 if (Test-Path $($targetDirPath)) { Remove-Item $($targetDirPath) }
