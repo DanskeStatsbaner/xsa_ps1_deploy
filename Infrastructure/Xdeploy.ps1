@@ -46,7 +46,7 @@ if (Test-Path $($targetDirPath)) { Remove-Item $($targetDirPath) }
 
 write-host "Write into : " $targetDirPath
 
-Copy-Item "$($workdirPath)" -include "dataArt.$projectNameLower.$releaseNumber.mtar"  -Destination "$($targetDirPath)" -Force
+Copy-Item "$($sourceDirPath)" -Destination "$($targetDirPath)" -Force
 
 $fullPath = "$($OctopusWorkDir)"
 $files = get-childitem "$fullPath" -include *.* -Recurse
@@ -66,7 +66,8 @@ foreach($file in $files)
 #
 ###############################################################################
 
-docker exec -t $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
+# docker exec -t $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
+docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
 
 # Get the log and put it into the Octopus log
 $workdirPath = "$($OctopusWorkDir)/$containerName.log"
