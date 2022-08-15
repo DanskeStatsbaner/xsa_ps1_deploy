@@ -29,10 +29,11 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 ###############################################################################
 # Copy project mtar file to work directory - $($OctopusWorkDir)\
 ###############################################################################
+$sourcedirPath = "$($OctopusWorkDir)/dataArt.$projectName.$releaseNumber.mtar"
+
 $workdirPath = "$($OctopusWorkDir)/$($containerName).mtar"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-$sourcedirPath = "$workdirPath/dataArt.$projectName.$releaseNumber.mtar"
 Copy-Item "$($sourcedirPath)" -Destination "$($workdirPath)" -Force
 
 ###############################################################################
