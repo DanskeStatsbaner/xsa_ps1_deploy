@@ -17,8 +17,9 @@ $workdirPath = $pwd.ToString()
 # $workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
+$projectNameLower = $projectName.ToLower()
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
+$containerName = "dataART.$($projectName).$($releaseNumber).$($environment)"
 
 $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]
@@ -36,8 +37,9 @@ foreach($file in $files)
     write-host "sourceDirPath : " $file.FullName
 }
 
-$projectNameLower = $projectName.ToLower()
-$sourceDirPath = "$($workdirPath)/dataART.$projectNameLower.$releaseNumber.mtar"
+#$projectNameLower = $projectName.ToLower()
+#$sourceDirPath = "$($workdirPath)/dataART.$projectNameLower.$releaseNumber.mtar"
+$sourceDirPath = "$($workdirPath)/dataART.$projectName.$releaseNumber.mtar"
 
 write-host "Read from : " $sourceDirPath
 
@@ -66,8 +68,7 @@ foreach($file in $files)
 #
 ###############################################################################
 
-# docker exec -t $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
-docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
+docker exec -t $containerName /bin/sh -c "cp /data/$containerName.mtar . && xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs deploy -f $containerName.mtar > /data/$containerName.log"
 
 # Get the log and put it into the Octopus log
 $workdirPath = "$($OctopusWorkDir)/$containerName.log"

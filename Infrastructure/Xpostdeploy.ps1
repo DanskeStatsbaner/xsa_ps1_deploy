@@ -14,8 +14,9 @@ write-host "*******************************************************************"
 $XSAPW = $args[0]
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
+$projectNameLower = $projectName.ToLower()
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
+$containerName = "dataART.$($projectName).$($releaseNumber).$($environment)"
 
 $XSAurl = $OctopusParameters["dataART.XSAUrl"]
 $XSAuser = $OctopusParameters["dataART.XSAUser"]

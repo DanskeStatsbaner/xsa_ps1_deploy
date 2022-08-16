@@ -12,8 +12,9 @@ write-host "*******************************************************************"
 ###############################################################################
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
+$projectNameLower = $projectName.ToLower()
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
-$containerName = "dataArt.$($projectName).$($releaseNumber).$($environment)"
+$containerName = "dataART.$($projectName).$($releaseNumber).$($environment)"
 
 $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 
