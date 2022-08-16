@@ -17,7 +17,7 @@ $artifactoryPW = $args[0]
 $login = $OctopusParameters["artifactory.login"]
 $registry = $OctopusParameters["artifactory.registry"]
 $projectName = $OctopusParameters["Octopus.Project.Name"]
-$projectNameLower = $projectName.ToLower()
+$projectName = $projectName.ToLower()
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 $containerName = "dataART.$($projectName).$($releaseNumber).$($environment)"
 
