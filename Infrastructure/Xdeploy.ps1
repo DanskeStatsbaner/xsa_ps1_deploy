@@ -17,7 +17,7 @@ $workdirPath = $pwd.ToString()
 # $workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
-$projectNameLower = $projectName.ToLower()
+$projectName = $projectName.ToLower()
 $releaseNumber = $OctopusParameters["Octopus.Release.Number"]
 $containerName = "dataART.$($projectName).$($releaseNumber).$($environment)"
 
