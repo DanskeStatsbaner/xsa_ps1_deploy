@@ -14,6 +14,7 @@ write-host "*******************************************************************"
 $DBpw = $args[0]
 $DBuser = $OctopusParameters["dataART.DBUser"]
 
+cd ../..
 $workdirPath = $(pwd)
 $projectName = $OctopusParameters["Octopus.Project.Name"]
 $projectName = $projectName.ToLower()

@@ -34,6 +34,7 @@ $OctopusWorkDir = $OctopusParameters["dataART.OctopusWorkDir"]
 
 write-host "*** Get SQL from project"
 
+cd ../..
 $workdirPath = $pwd.ToString()
 
 $fullPath = "$($workdirPath)/Deployment/PostDeploy/$($environment)/*.txt"

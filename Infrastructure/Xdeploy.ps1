@@ -13,7 +13,9 @@ write-host "*******************************************************************"
 
 $XSAPW = $args[0]
 
+cd ../..
 $workdirPath = $pwd.ToString()
+write-host "PWD : " $workdirPath
 # $workdirPath = $workdirPath.Substring(0, $workdirPath.IndexOf("\Deployment"))
 
 $projectName = $OctopusParameters["Octopus.Project.Name"]
