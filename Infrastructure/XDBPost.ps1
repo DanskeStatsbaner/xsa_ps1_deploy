@@ -53,17 +53,17 @@ write-host "*** Run DB prepare SQL"
 $allLines = 'CALL "SYSTEM"."REVOKE_REMOTE_SOURCE_ACCESS"(EX_MESSAGE => ?);'
 
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) ?);'
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 Set-Content $($workdirPath) -value $allLines 
 
-docker exec -it $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
+docker exec -t $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -d $HANADatabase -u $DBuser -p $DBpw -quiet -a -I /data/$($containerName)-SQLoneLine.txt -O /data/$($containerName)-SQLoutput.txt"
 
 ###############################################################################
 # Cleanup - delete files
 ###############################################################################
 
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) ?);'
+if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
 docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
 
