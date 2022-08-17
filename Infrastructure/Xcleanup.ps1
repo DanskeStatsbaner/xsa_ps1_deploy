@@ -27,7 +27,7 @@ if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 $workdirPath = "$($OctopusWorkDir)/$($containerName).mtar"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-docker exec -t $containerName /bin/sh -c "rm -fv /data/*.txt"
+docker exec -t $containerName /bin/sh -c "rm -fv /data/$($containerName)*.txt"
 
 ###############################################################################
 # Stop and delete containers
