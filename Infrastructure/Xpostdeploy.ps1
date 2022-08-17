@@ -81,6 +81,7 @@ docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
+$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
 $File = Get-Content $($workdirPath)
 
 foreach ($line in $File)
@@ -102,6 +103,7 @@ write-host "*** Setup servicekey $serviceKey"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
 
+$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceKey.txt"
 $File = Get-Content $($workdirPath)
 
 foreach ($line in $File)
