@@ -132,8 +132,9 @@ if ($DBuser -eq ' ')
 ###############################################################################
 
 write-host "*** Run post-deployment SQL"
-$workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoutput.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
+
+docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
+
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 Set-Content $($workdirPath) -value $allLines 
