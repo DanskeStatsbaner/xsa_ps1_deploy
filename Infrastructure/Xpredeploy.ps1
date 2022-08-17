@@ -76,8 +76,8 @@ if ($allLines -eq ' ')
 ###############################################################################
 
 write-host "*** Get MTA information for $projectName"
-$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceName.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
+
+docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
@@ -99,8 +99,6 @@ foreach ($line in $File)
 $serviceKey = $($serviceName) + "-sk"
 
 write-host "*** Setup servicekey $serviceKey"
-$workdirPath = "$($OctopusWorkDir)/$($containerName)-serviceKey.txt"
-if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs delete-service-key $serviceName $serviceKey -f && xs create-service-key $serviceName $serviceKey && xs service-key $serviceName $serviceKey > /data/$($containerName)-serviceKey.txt"
 
