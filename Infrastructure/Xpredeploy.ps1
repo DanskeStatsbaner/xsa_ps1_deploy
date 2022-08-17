@@ -77,7 +77,7 @@ if ($allLines -eq ' ')
 
 write-host "*** Get MTA information for $projectName"
 
-docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
+docker exec -t $containerName /bin/sh -c "rm -fv /data/*.txt"
 
 docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs mta $projectName > /data/$($containerName)-serviceName.txt"
 
@@ -133,7 +133,7 @@ if ($DBuser -eq ' ')
 
 write-host "*** Run pre-deployment SQL"
 
-docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
+docker exec -t $containerName /bin/sh -c "rm -fv /data/*.txt"
 
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
@@ -173,7 +173,7 @@ docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSA
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
+docker exec -t $containerName /bin/sh -c "rm -fv /data/*.txt"
 
 write-host "*******************************************************************"
 write-host " STOP predeploy.ps1"
