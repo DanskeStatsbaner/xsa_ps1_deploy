@@ -56,7 +56,7 @@ docker exec -t $containerName /bin/sh -c "hdbsql -n $HANAHost -i $HANAInstance -
 $workdirPath = "$($OctopusWorkDir)/$($containerName)-SQLoneLine.txt"
 if (Test-Path $($workdirPath)) { Remove-Item $($workdirPath) }
 
-docker exec -t $containerName /bin/sh -c "rm -fv *.txt"
+docker exec -t $containerName /bin/sh -c "rm -fv /data/*.txt"
 
 write-host "*******************************************************************"
 write-host " STOP DBPrep.ps1"
