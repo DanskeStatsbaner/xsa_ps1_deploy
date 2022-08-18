@@ -77,9 +77,9 @@ if ($Matches.LineNumber -gt 0)
     $exitCode = 1
 
     # Download logfiles
-    docker exec -it $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
+    docker exec -t $containerName /bin/sh -c "xs login -u $XSAuser -p $XSAPW -a $XSAurl -o orgname -s $XSAspace && xs dmol -i $logNo"
     $dmolDir = "./mta-op-$logNo"
-    docker exec -it $containerName /bin/sh -c "cd $dmolDir . && cat * . "
+    docker exec -t $containerName /bin/sh -c "cd $dmolDir . && cat * . "
 }
 
 # cleanup
